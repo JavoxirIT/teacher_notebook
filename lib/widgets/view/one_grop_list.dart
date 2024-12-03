@@ -42,6 +42,18 @@ class _OneGroupListState extends State<OneGroupList> {
     return Scaffold(
       appBar: AppBar(
         title: Text(group.groupName),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: colorRed,
+          ),
+          onPressed: () {
+            context.read<StudentInAGroupBloc>().add(
+                  StudentInAGroupEventInitial(),
+                );
+            Navigator.of(context).pop(); // Возврат к предыдущему экрану.
+          },
+        ),
       ),
       body: BlocBuilder<StudentInAGroupBloc, StudentInAGroupBlockState>(
         builder: (context, state) {

@@ -14,6 +14,7 @@ class StudentInAGroupBloc
       : super(StudentInAGroupBlockInitial()) {
     on<StudentInAGroupEvent>(_studentInAGroup);
     on<StudentInAGroupDeleteEvent>(deleteStudentFromGroup);
+    on<StudentInAGroupEventInitial>(changeState);
   }
 
   final StudentAddGroupRepository _groupRepository;
@@ -22,7 +23,7 @@ class StudentInAGroupBloc
       Emitter<StudentInAGroupBlockState> emit) async {
     try {
       final result = await _groupRepository.queryOneGroup(event.id!);
-      log('$result');
+      // log('$result');
       if (result.isEmpty) {
         emit(StudentInAGroupNotDataState());
       } else {
@@ -42,5 +43,10 @@ class StudentInAGroupBloc
     } on Exception catch (e) {
       log('delete user in a group error: $e');
     }
+  }
+
+  Future<void> changeState(StudentInAGroupEventInitial event,
+      Emitter<StudentInAGroupBlockState> emit) async {
+    emit(StudentInAGroupNotDataState());
   }
 }

@@ -23,3 +23,5 @@ class StudentInAGroupDeleteEvent extends StudentInAGroupBlockEvent {
   @override
   List<Object> get props => super.props..addAll([id, studentId]);
 }
+
+class StudentInAGroupEventInitial extends StudentInAGroupBlockEvent {}
