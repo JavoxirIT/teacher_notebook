@@ -1,6 +1,8 @@
-import 'package:assistant/bloc/group_bloc/group_bloc.dart';
-import 'package:assistant/theme/style_constant.dart';
-import 'package:assistant/widgets/group/group_card.dart';
+import 'dart:developer';
+
+import 'package:TeamLead/bloc/group_bloc/group_bloc.dart';
+import 'package:TeamLead/theme/color.dart';
+import 'package:TeamLead/widgets/group/group_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,14 +16,8 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   @override
   void initState() {
-    loadData();
+    BlocProvider.of<GroupBloc>(context).add(GroupEventLoad());
     super.initState();
-  }
-
-  loadData() {
-    setState(() {
-      BlocProvider.of<GroupBloc>(context).add(GroupEventLoad());
-    });
   }
 
   @override
@@ -58,7 +54,7 @@ class _GroupListState extends State<GroupList> {
             itemBuilder: (context, index) {
               final group = state.group[index];
               // print(state.group[index]);
-              return groupCard(context, group);
+              return GroupCard(group: group);
             },
           );
         }
@@ -76,7 +72,8 @@ class _GroupListState extends State<GroupList> {
             itemCount: state.group.length,
             itemBuilder: (context, index) {
               final group = state.group[index];
-              return groupCard(context, group);
+              log("$group");
+              return GroupCard(group: group);
             },
           );
         }

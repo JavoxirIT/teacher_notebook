@@ -7,8 +7,6 @@ sealed class PaymentsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class PaymentsEventLoad extends PaymentsEvent {}
-
 // для загрузки плотежей от одного пользователя
 class PaymentsOneStudentEventLoad extends PaymentsEvent {
   const PaymentsOneStudentEventLoad({
@@ -18,4 +16,13 @@ class PaymentsOneStudentEventLoad extends PaymentsEvent {
 
   @override
   List<Object> get props => super.props..addAll([id]);
+}
+
+class PaymentsEventLoad extends PaymentsEvent {
+  const PaymentsEventLoad({ this.month,  this.year});
+  final String? month;
+  final String? year;
+
+  @override
+  List<Object> get props => super.props..addAll([month!, year!]);
 }

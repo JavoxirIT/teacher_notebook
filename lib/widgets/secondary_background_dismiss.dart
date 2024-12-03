@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-Container secondaryBackgroundDismiss() {
+Container secondaryBackgroundDismiss(String label) {
   return Container(
     color: Colors.green,
-    child: const Row(
+    child: Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Padding(
+        const Padding(
           padding: EdgeInsets.only(right: 5.0),
           child: Center(
               child: Icon(
@@ -15,11 +15,11 @@ Container secondaryBackgroundDismiss() {
           )),
         ),
         Padding(
-          padding: EdgeInsets.only(right: 20.0),
+          padding: const EdgeInsets.only(right: 20.0),
           child: Center(
             child: Text(
-              "Изменить",
-              style: TextStyle(
+              label,
+              style: const TextStyle(
                 color: Colors.white,
               ),
             ),

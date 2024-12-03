@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:assistant/constants/route_name/route_name.dart';
-import 'package:assistant/theme/style_constant.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:assistant/db/models/student_bd_models.dart';
 
+import 'package:TeamLead/constants/route_name/route_name.dart';
+import 'package:TeamLead/db/models/student_bd_models.dart';
+import 'package:TeamLead/theme/color.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:gap/gap.dart';
 
 class OneStudentsView extends StatefulWidget {
   const OneStudentsView({super.key});
@@ -40,139 +40,200 @@ class _OneStudentsViewState extends State<OneStudentsView> {
 
   @override
   Widget build(BuildContext context) {
+    final nameTextStyle = Theme.of(context)
+        .textTheme
+        .bodySmall!
+        .copyWith(color: colorWhite, fontSize: 18.0);
+
+    const buttonStyle = ButtonStyle(
+      backgroundColor: WidgetStatePropertyAll(colorWhite),
+      foregroundColor: WidgetStatePropertyAll(colorBlue),
+      side: WidgetStatePropertyAll(BorderSide.none),
+      textStyle: WidgetStatePropertyAll(
+        TextStyle(fontSize: 12.0, fontWeight: FontWeight.w900),
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('${_userData.studentName}  ${_userData.studentSurName}'),
-        centerTitle: true,
+        backgroundColor: colorBlue,
+        actions: [
+          OutlinedButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                RouteName.payAdnPayAddView,
+                arguments: _userData,
+              );
+            },
+            style: buttonStyle,
+            child: const Text("Добавить оплату"),
+          ),
+          const Gap(10.0),
+          OutlinedButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                RouteName.localSudentUpdate,
+                arguments: _userData,
+              );
+            },
+            style: buttonStyle,
+            child: const Text("Редактировать"),
+          ),
+          const Gap(10.0),
+        ],
       ),
-      body: ListView(
+      body: Column(
         children: [
-          Card(
+          Container(
+            padding: const EdgeInsets.all(20.0),
+            color: colorBlue,
             child: Column(
               children: [
-                const SizedBox(height: 20.0),
                 Center(
                   child: CircleAvatar(
-                    backgroundColor: iconGreenColor,
+                    backgroundColor: colorWhite,
                     radius: 90,
                     child: ClipOval(
-                      child: _userData.studentImg != "" ? Image.memory(
-                        const Base64Decoder().convert(_userData.studentImg!),
-                        fit: BoxFit.cover,
-                        width: 170,
-                        height: 170,
-                      ) : null,
+                      child: _userData.studentImg != ""
+                          ? Image.memory(
+                              const Base64Decoder()
+                                  .convert(_userData.studentImg!),
+                              fit: BoxFit.cover,
+                              width: 150,
+                              height: 150,
+                            )
+                          : null,
                     ),
                   ),
                 ),
-                ListTile(
-                  title: Text('Имя:  ${_userData.studentName}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(FontAwesomeIcons.solidUser),
+                const Gap(10.0),
+                Text(
+                  'Имя:  ${_userData.studentName}',
+                  style: nameTextStyle,
                 ),
-                ListTile(
-                  title: Text('Фамилия:  ${_userData.studentSurName}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(FontAwesomeIcons.solidUser),
+                Text(
+                  'Фамилия:  ${_userData.studentSurName}',
+                  style: nameTextStyle,
                 ),
-                ListTile(
-                  title: Text('Отчество:  ${_userData.studentSecondName}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(FontAwesomeIcons.solidUser),
+                Text(
+                  'Отчество:  ${_userData.studentSecondName}',
+                  style: nameTextStyle,
                 ),
-                ListTile(
-                  title: Text('Дата рождения:  ${_userData.studentBrithDay}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(FontAwesomeIcons.calendar),
-                ),
-                ListTile(
-                  title: Text('Адресс:  ${_userData.studentAddres}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(FontAwesomeIcons.addressCard),
-                ),
-                ListTile(
-                  title: Text(
-                      'Школа и класс:  ${_userData.studentSchoolAndClassNumber}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(FontAwesomeIcons.addressCard),
-                ),
-                ListTile(
-                  title: Text('С/П или С/М:  ${_userData.studentDocumentNomer}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(FontAwesomeIcons.addressCard),
-                ),
-                ListTile(
-                  splashColor: colorGreen,
-                  title: Text('Тел:  ${_userData.studentPhone}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(
-                    FontAwesomeIcons.phone,
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(10.0),
+            child: Table(
+              columnWidths: const {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(1),
+              },
+              children: [
+                TableRow(children: [
+                  TableCell(
+                    child: Text('Дата рождения:',
+                        style: Theme.of(context).textTheme.bodyMedium),
                   ),
-                  onTap: () {
-                    _callNumber();
-                  },
-                ),
-                ListTile(
-                  title: Text('Ф.И радителя: ${_userData.studentParentsFio}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(FontAwesomeIcons.addressCard),
-                ),
-                ListTile(
-                  splashColor: colorGreen,
-                  title: Text(
-                      'Тел. родителя:  ${_userData.studentParentsPhone}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(
-                    FontAwesomeIcons.phone,
-                  ),
-                  onTap: () {
-                    _callNumber();
-                  },
-                ),
-                ListTile(
-                  title: Text('Обучение:  ${dataPayStatus()}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  leading: const Icon(
-                    FontAwesomeIcons.cashRegister,
-                  ),
-                ),
-                // ListTile(
-                //   title: Text('Группа:  ${_userData.studentGroupName}',
-                //       style: Theme.of(context).textTheme.bodyMedium),
-                //   leading: const Icon(
-                //     FontAwesomeIcons.cashRegister,
-                //   ),
-                // ),
-                ButtonBar(
-                  alignment: MainAxisAlignment.end,
-                  buttonPadding: const EdgeInsets.all(20.0),
-                  buttonMinWidth: 250.0,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        // Route route = MaterialPageRoute(
-                        //     builder: (context) =>
-                        //         PaymentsView(student: _userData));
-                        // Navigator.push(context, route);
-                        Navigator.of(context).pushNamed(
-                          RouteName.payAdnPayAddView,
-                          arguments: _userData,
-                        );
-                      },
-                      child: const Text("Добавить оплату"),
+                  TableCell(
+                    child: Text(
+                      _userData.studentBrithDay,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.end,
                     ),
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          RouteName.localSudentUpdate,
-                          arguments: _userData,
-                        );
-                      },
-                      // style: outlineButtonStyleDanger,
-                      child: const Text("Редактировать"),
-                    )
-                  ],
-                )
+                  )
+                ]),
+                TableRow(children: [
+                  TableCell(
+                    child: Text('Номер документа CE',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  TableCell(
+                    child: Text(
+                      _userData.studentDocumentNomer,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.end,
+                    ),
+                  )
+                ]),
+                TableRow(children: [
+                  TableCell(
+                    child: Text('Адрес прожтвания',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  TableCell(
+                    child: Text(
+                      _userData.studentAddres,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.end,
+                    ),
+                  )
+                ]),
+                TableRow(children: [
+                  TableCell(
+                    child: Text('Образование или школа',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  TableCell(
+                    child: Text(
+                      _userData.studentSchoolAndClassNumber,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.end,
+                    ),
+                  )
+                ]),
+                TableRow(children: [
+                  TableCell(
+                    child: Text('Контактный номер студента',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  TableCell(
+                    child: Text(
+                      _userData.studentPhone,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.end,
+                    ),
+                  )
+                ]),
+                TableRow(children: [
+                  TableCell(
+                    child: Text('Радитель',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  TableCell(
+                    child: Text(
+                      _userData.studentParentsFio,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.end,
+                    ),
+                  )
+                ]),
+                TableRow(children: [
+                  TableCell(
+                    child: Text('Контактеый номер радитель',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  TableCell(
+                    child: Text(
+                      _userData.studentParentsPhone,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.end,
+                    ),
+                  )
+                ]),
+                TableRow(children: [
+                  TableCell(
+                    child: Text('Форма обучения',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  TableCell(
+                    child: Text(
+                      dataPayStatus(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.end,
+                    ),
+                  )
+                ]),
               ],
             ),
           ),

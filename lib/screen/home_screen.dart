@@ -1,6 +1,8 @@
-import 'package:assistant/widgets/group/group_list.dart';
+import 'package:TeamLead/db/student_repository.dart';
+import 'package:TeamLead/navigation/drawer_menu.dart';
+import 'package:TeamLead/widgets/group/group_list.dart';
+import 'package:TeamLead/widgets/home_widgets/home_grid.dart';
 import 'package:flutter/material.dart';
-import 'package:assistant/navigation/drawer_menu.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,113 +12,63 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int studentCount = 0;
+  int numberOfPaid = 0;
+  int numberNotOfPaid = 0;
+
+  @override
+  void initState() {
+    getStudentCount();
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Главная"),
-        // centerTitle: true,
       ),
       drawer: const DrawerMenu(),
-      body: Column(
-        children: [
-          SizedBox(
-            // height: 30.0,
-            width: MediaQuery.of(context).size.width,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 27.0, vertical: 10.0),
-              child: Text(
-                "Статистика",
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 27.0, vertical: 10.0),
+                child: Text("Статистика"),
               ),
             ),
-          ),
-          info(),
-          SizedBox(
-            // height: 30.0,
-            width: MediaQuery.of(context).size.width,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 27),
-              child: Text(
-                "Список групп",
+            HomeGrid(
+                stCount: studentCount,
+                numberOfPaid: numberOfPaid,
+                numberNotOfPaid: numberNotOfPaid),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 27, vertical: 10.0),
+                child: Text("Список групп"),
               ),
             ),
-          ),
-          const Expanded(
-            child: SizedBox(
-              // height: MediaQuery.of(context).size.height / 2,
-              child: Padding(
+            SizedBox(
+              height:
+                  MediaQuery.of(context).size.height / 2, // Ограничение высоты
+              child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: GroupList(),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  GridView info() {
-    return GridView(
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      // itemCount: 4,
-      children: [
-        Card(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Количество уч.',
-                ),
-                Text(
-                  '50',
-                ),
-              ],
-            ),
-          ),
-        ),
-        Card(
-          child: Center(
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Бесплатно'),
-                Text('15'),
-              ],
-            ),
-          ),
-        ),
-        Card(
-          child: Center(
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Платно'),
-                Text('35'),
-              ],
-            ),
-          ),
-        ),
-        Card(
-          child: Center(
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Оплатили за месяц"),
-                Text('20'),
-              ],
-            ),
-          ),
-        ),
-      ],
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 1.0,
-        crossAxisSpacing: 0.0,
-        mainAxisSpacing: 5,
-        mainAxisExtent: 120,
-      ),
-    );
+  Future<void> getStudentCount() async {
+    studentCount = await StudentRepository.db.getStudentCount();
+    numberOfPaid = await StudentRepository.db.getStudentCountPay();
+    numberNotOfPaid = await StudentRepository.db.getStudentCountNotPay();
+    setState(() {});
   }
 }

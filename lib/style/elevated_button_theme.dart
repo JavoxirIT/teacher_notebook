@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 final ButtonStyle elevatedButtonTheme = ElevatedButton.styleFrom(
-  foregroundColor: Colors.white,
-  backgroundColor: const Color.fromARGB(255, 251, 189, 4),
+  // foregroundColor: Colors.white,
+  // backgroundColor: const Color.fromARGB(255, 251, 189, 4),
   minimumSize: const Size(88, 36),
   padding: const EdgeInsets.symmetric(horizontal: 16),
   shape: const RoundedRectangleBorder(
@@ -11,5 +11,5 @@ final ButtonStyle elevatedButtonTheme = ElevatedButton.styleFrom(
   textStyle: const TextStyle(
     fontSize: 14
   ),
-  shadowColor: const Color.fromARGB(255, 27, 27, 27)
+  // shadowColor: const Color.fromARGB(255, 27, 27, 27)
 );

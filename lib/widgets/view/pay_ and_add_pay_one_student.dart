@@ -1,30 +1,37 @@
-import 'package:assistant/db/models/student_bd_models.dart';
-import 'package:assistant/db/models/student_in_a_group_models.dart';
-import 'package:assistant/widgets/form/payments_form.dart';
-import 'package:assistant/widgets/view/one_student_payments_data.dart';
+import 'package:TeamLead/db/models/student_bd_models.dart';
+import 'package:TeamLead/db/models/student_in_a_group_models.dart';
+import 'package:TeamLead/widgets/form/payments_form.dart';
+import 'package:TeamLead/widgets/view/one_student_payments_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class PayAndAddPayOneStudent extends StatefulWidget {
-  const PayAndAddPayOneStudent({Key? key}) : super(key: key);
+  const PayAndAddPayOneStudent({super.key});
 
   @override
-  _PayAndAddPayOneStudentState createState() => _PayAndAddPayOneStudentState();
+  State<PayAndAddPayOneStudent> createState() => _PayAndAddPayOneStudentState();
 }
 
 class _PayAndAddPayOneStudentState extends State<PayAndAddPayOneStudent> {
   var _userData;
   int? _studentId;
+  int? _groupId;
 
   @override
   void didChangeDependencies() {
     RouteSettings setting = ModalRoute.of(context)!.settings;
+
     if (setting.arguments is StudentDB) {
       _userData = setting.arguments as StudentDB;
       _studentId = _userData.id;
-    } else if (setting.arguments is StudentInAGroupModels) {
-      _userData = setting.arguments as StudentInAGroupModels;
+      // log('_PayAndAddPayOneStudentState StudentDB: ${_userData.id}');
+    } else if (setting.arguments is Map<String, dynamic>) {
+      Map<String, dynamic> data = setting.arguments as Map<String, dynamic>;
+      _userData = data['dataStudent'] as StudentInAGroupModels;
       _studentId = _userData.studentId;
+      _groupId = data['groupId'];
+      // _userData = setting.arguments as StudentInAGroupModels;
+      // log('_PayAndAddPayOneStudentState StudentInAGroupModels: ${_studentId}');
     }
     // _studentId = _userData.id;
     setState(() {});
@@ -37,7 +44,7 @@ class _PayAndAddPayOneStudentState extends State<PayAndAddPayOneStudent> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          // title: const Text('Title'),
+          title: const Text('Окно оплаты'),
           centerTitle: true,
           bottom: const TabBar(
             tabs: <Widget>[
@@ -60,8 +67,8 @@ class _PayAndAddPayOneStudentState extends State<PayAndAddPayOneStudent> {
         ),
         body: TabBarView(
           children: [
-            PaymentsForm(_userData),
-            OneStudentPaymentsData(_studentId!),
+            PaymentsForm(_userData, _groupId, _studentId!),
+            OneStudentPaymentsData(studentId: _studentId!),
           ],
         ),
       ),

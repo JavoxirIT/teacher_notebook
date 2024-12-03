@@ -1,9 +1,9 @@
-import 'package:assistant/bloc/group_bloc/group_bloc.dart';
-import 'package:assistant/db/models/group_db_models.dart';
-import 'package:assistant/style/clear_button_style.dart';
-import 'package:assistant/widgets/show_cupertino_modal_popup.dart';
-import 'package:assistant/widgets/show_snak_bar.dart';
-import 'package:assistant/widgets/table_row.dart';
+import 'package:TeamLead/bloc/group_bloc/group_bloc.dart';
+import 'package:TeamLead/db/models/group_db_models.dart';
+import 'package:TeamLead/style/clear_button_style.dart';
+import 'package:TeamLead/widgets/show_cupertino_modal_popup.dart';
+import 'package:TeamLead/widgets/show_snak_bar.dart';
+import 'package:TeamLead/widgets/table_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,18 +89,18 @@ class _GroupAddFormState extends State<GroupAddForm> {
                         ),
                         onTap: () {
                           showCupModalPopup(
-                            CupertinoTimerPicker(
-                              initialTimerDuration: duration,
-                              mode: CupertinoTimerPickerMode.hm,
-                              onTimerDurationChanged: (time) {
-                                setState(() {
-                                  _groupTime.text =
-                                      '${time.inHours}:${time.inMinutes % 60}';
-                                });
-                              },
-                            ),
-                            context,
-                          );
+                              CupertinoTimerPicker(
+                                initialTimerDuration: duration,
+                                mode: CupertinoTimerPickerMode.hm,
+                                onTimerDurationChanged: (time) {
+                                  setState(() {
+                                    _groupTime.text =
+                                        '${time.inHours}:${time.inMinutes % 60}';
+                                  });
+                                },
+                              ),
+                              context,
+                              400);
                         },
                         keyboardType: TextInputType.datetime,
                         validator: (value) =>
@@ -128,25 +128,44 @@ class _GroupAddFormState extends State<GroupAddForm> {
                             value == "" ? "Заполните поле" : null,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 10),
-                      child: DropdownButtonFormField(
-                        decoration: const InputDecoration(
-                          label: Text("Дни занятия"),
+                    SegmentedButton(
+                      showSelectedIcon: false,
+                      segments: const [
+                        ButtonSegment(value: 1, label: Text("ПН-СР-ПТ")),
+                        ButtonSegment(value: 0, label: Text("ВТ-ЧТ-СУ")),
+                      ],
+                      selected: {_groupDays},
+                      onSelectionChanged: (newSelection) {
+                        setState(() {
+                          _groupDays = newSelection.first;
+                        });
+                      },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.selected)) {
+                            return Colors.blue; // Цвет для выбранного состояния
+                          }
+                          return Colors
+                              .grey[200]; // Цвет для обычного состояния
+                        }),
+                        foregroundColor:
+                            WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.selected)) {
+                            return Colors
+                                .white; // Цвет текста для выбранного состояния
+                          }
+                          return Colors
+                              .black; // Цвет текста для обычного состояния
+                        }),
+                        overlayColor: WidgetStateProperty.all(
+                            Colors.blue.withOpacity(0.2)), // Цвет при нажатии
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8), // Радиус углов
+                          ),
                         ),
-                        items: const [
-                          DropdownMenuItem(value: 1, child: Text("ПН-СР-ПТ")),
-                          DropdownMenuItem(value: 0, child: Text("ВТ-ЧТ-СУ")),
-                        ],
-                        onChanged: (values) {
-                          setState(() {
-                            _groupDays = values;
-                          });
-                        },
-                        value: _groupDays,
-                        validator: (val) =>
-                            val == null ? "Выберите дни обучения" : null,
                       ),
                     ),
                   ],
@@ -162,7 +181,7 @@ class _GroupAddFormState extends State<GroupAddForm> {
                       if (_formKey.currentState!.validate()) {
                         _showDialog(context);
                       } else {
-                        showSnackInfoBar(context, 'Сначала добавьте данные');
+                        showSnackInfoBar(context, 'С начала добавьте данные');
                       }
                     },
                     child: const Text("Добавить"),

@@ -1,7 +1,7 @@
+import 'package:TeamLead/constants/route_name/route_name.dart';
+import 'package:TeamLead/repositories/models/student_model.dart';
+import 'package:TeamLead/repositories/student_list_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:assistant/constants/route_name/route_name.dart';
-import 'package:assistant/repositories/models/student_model.dart';
-import 'package:assistant/repositories/student_list_repository.dart';
 
 class GeneralListOfStudents extends StatefulWidget {
   const GeneralListOfStudents({
@@ -28,7 +28,7 @@ class _GeneralListOfStudentsState extends State<GeneralListOfStudents> {
     _user = await StudentListRepository().getStudentsList();
     setState(() {});
   }
-      
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

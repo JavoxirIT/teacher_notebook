@@ -1,7 +1,7 @@
+import 'package:TeamLead/navigation/drawer_menu.dart';
+import 'package:TeamLead/widgets/search.dart';
+import 'package:TeamLead/widgets/student_list/local_data_student_list.dart';
 import 'package:flutter/material.dart';
-import 'package:assistant/widgets/search.dart';
-import 'package:assistant/widgets/student_list/local_data_student_list.dart';
-import 'package:assistant/navigation/drawer_menu.dart';
 
 class StudentsLocalDBDatsScreen extends StatelessWidget {
   const StudentsLocalDBDatsScreen({super.key});
@@ -14,16 +14,19 @@ class StudentsLocalDBDatsScreen extends StatelessWidget {
         ),
       ),
       drawer: const DrawerMenu(),
-      body: const Column(
-        children: [
-          SearchBarComponents(),
-          Expanded(
-            child: SizedBox(
-              // height: 200.0,
-              child: LocalDataStudentList(),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        child: const Column(
+          children: [
+            SearchBarComponents(),
+            Expanded(
+              child: SizedBox(
+                // height: 200.0,
+                child: LocalDataStudentList(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

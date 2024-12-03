@@ -1,5 +1,7 @@
-import 'package:assistant/db/models/student_in_a_group_models.dart';
-import 'package:assistant/db/student_add_group_repository.dart';
+import 'dart:developer';
+
+import 'package:TeamLead/db/models/student_in_a_group_models.dart';
+import 'package:TeamLead/db/student_add_group_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,9 +12,8 @@ class StudentInAGroupBloc
     extends Bloc<StudentInAGroupBlockEvent, StudentInAGroupBlockState> {
   StudentInAGroupBloc(this._groupRepository)
       : super(StudentInAGroupBlockInitial()) {
-    on<StudentInAGroupBlockEvent>((event, emit) {
-            on<StudentInAGroupEvent>(_studentInAGroup);
-    });
+    on<StudentInAGroupEvent>(_studentInAGroup);
+    on<StudentInAGroupDeleteEvent>(deleteStudentFromGroup);
   }
 
   final StudentAddGroupRepository _groupRepository;
@@ -21,6 +22,7 @@ class StudentInAGroupBloc
       Emitter<StudentInAGroupBlockState> emit) async {
     try {
       final result = await _groupRepository.queryOneGroup(event.id!);
+      log('$result');
       if (result.isEmpty) {
         emit(StudentInAGroupNotDataState());
       } else {
@@ -28,6 +30,17 @@ class StudentInAGroupBloc
       }
     } on Exception catch (e) {
       emit(StudentInAGroupErrorState(exception: e));
+    }
+  }
+
+  Future<void> deleteStudentFromGroup(StudentInAGroupDeleteEvent event,
+      Emitter<StudentInAGroupBlockState> emit) async {
+    try {
+      final result =
+          _groupRepository.deleteStudentFromGroup(event.id, event.studentId);
+      log('delete user from group $result');
+    } on Exception catch (e) {
+      log('delete user in a group error: $e');
     }
   }
 }

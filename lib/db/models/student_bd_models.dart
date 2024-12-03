@@ -1,20 +1,4 @@
 class StudentDB {
-  late int? id;
-  late String studentName;
-  late String studentSecondName;
-  late String studentSurName;
-  late String studentBrithDay;
-  late String studentAddres;
-  late String studentPhone;
-  late String studentSchoolAndClassNumber;
-  late String studentDocumentNomer;
-  late String? studentImg;
-  late int studentPayStatus;
-  late String studentParentsFio;
-  late String studentParentsPhone;
-  late int? studentGroupId;
-  late String studentGroupName;
-  late bool? studentGroupStatus;
 
   StudentDB(
     this.id,
@@ -33,6 +17,24 @@ class StudentDB {
     this.studentGroupId,
     this.studentGroupStatus,
   );
+
+  late int? id;
+  late String studentName;
+  late String studentSecondName;
+  late String studentSurName;
+  late String studentBrithDay;
+  late String studentAddres;
+  late String studentPhone;
+  late String studentSchoolAndClassNumber;
+  late String studentDocumentNomer;
+  late String? studentImg;
+  late int studentPayStatus;
+  late String studentParentsFio;
+  late String studentParentsPhone;
+  late int? studentGroupId = 0;
+  late String studentGroupName;
+  late int? studentGroupStatus = 0;
+
 
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};

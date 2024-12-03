@@ -1,5 +1,5 @@
-import 'package:assistant/bloc/student_bloc/student_bloc.dart';
-import 'package:assistant/widgets/student_list/components/student_list_data.dart';
+import 'package:TeamLead/bloc/student_bloc/student_bloc.dart';
+import 'package:TeamLead/widgets/student_list/components/student_list_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

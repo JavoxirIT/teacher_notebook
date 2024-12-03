@@ -1,22 +1,33 @@
-import 'package:assistant/bloc/group_bloc/group_bloc.dart';
-import 'package:assistant/bloc/payments_bloc/payments_bloc.dart';
-import 'package:assistant/bloc/student_and_group_bloc/student_and_group_list_bloc.dart';
-import 'package:assistant/bloc/student_bloc/student_bloc.dart';
-import 'package:assistant/bloc/student_in_a_group_bloc/student_in_a_group_bloc.dart';
-import 'package:assistant/bloc/theme_bloc/theme_bloc_bloc.dart';
-import 'package:assistant/db/new_group_repository.dart';
-import 'package:assistant/db/payments_repository.dart';
-import 'package:assistant/db/student_add_group_repository.dart';
-import 'package:assistant/db/student_repository.dart';
-import 'package:assistant/navigation/routes/routers.dart';
-import 'package:assistant/screen/splash_screen.dart';
+import 'package:TeamLead/screen/home_screen.dart';
+import 'package:TeamLead/theme/dark_theme.dart';
+import 'package:TeamLead/theme/light_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(const MyApp());
+import 'bloc/group_bloc/group_bloc.dart';
+import 'bloc/payments_bloc/payments_bloc.dart';
+import 'bloc/student_and_group_bloc/student_and_group_list_bloc.dart';
+import 'bloc/student_bloc/student_bloc.dart';
+import 'bloc/student_in_a_group_bloc/student_in_a_group_bloc.dart';
+import 'bloc/theme/theme_cubit.dart';
+import 'db/new_group_repository.dart';
+import 'db/payments_repository.dart';
+import 'db/student_add_group_repository.dart';
+import 'db/student_repository.dart';
+import 'navigation/routes/routers.dart';
+import 'setting/setting_repository.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  runApp(MyApp(preferences: prefs));
+}
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.preferences});
+
+  final SharedPreferences preferences;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -25,11 +36,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    final settingRepository =
+        SettingRepository(preferences: widget.preferences);
     return MultiBlocProvider(
       providers: [
         BlocProvider<StudentBloc>(
             create: (context) => StudentBloc(StudentRepository.db)),
-        BlocProvider<ThemeBlocBloc>(create: (context) => ThemeBlocBloc()),
         BlocProvider<PaymentsBloc>(
             create: (context) => PaymentsBloc(PaysRepository.db)),
         BlocProvider(create: (context) => GroupBloc(NewGroupRepository.db)),
@@ -39,6 +51,9 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
             create: (context) =>
                 StudentInAGroupBloc(StudentAddGroupRepository.db)),
+        BlocProvider(
+            create: (context) =>
+                ThemeCubit(settingRepository: settingRepository)),
       ],
       child: const AppTheme(),
     );
@@ -56,23 +71,14 @@ class AppTheme extends StatefulWidget {
 
 class _AppThemeState extends State<AppTheme> {
   @override
-  void initState() {
-    BlocProvider.of<ThemeBlocBloc>(context).add(ThemeInitEvent());
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBlocBloc, ThemeBlocState>(
+    return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {
-        if (state is ThemeAddState) {
-          return MaterialApp(
-            home: const SplashScreen(),
-            theme: state.theme,
-            routes: routers,
-          );
-        }
-        return const SizedBox();
+        return MaterialApp(
+          home: HomeScreen(),
+          theme: state.isTheme ? darkTheme : lightTheme,
+          routes: routers,
+        );
       },
     );
   }

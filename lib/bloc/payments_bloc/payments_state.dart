@@ -20,7 +20,7 @@ final class PaymentsLoadedState extends PaymentsState {
   const PaymentsLoadedState({
     required this.loadedPayments,
   });
-  final List<PaymentsDB> loadedPayments;
+  final Map<String, List<PaymentsDB>> loadedPayments;
 
   @override
   List<Object> get props => super.props..add(loadedPayments);

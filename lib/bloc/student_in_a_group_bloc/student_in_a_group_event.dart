@@ -14,3 +14,12 @@ class StudentInAGroupEvent extends StudentInAGroupBlockEvent {
   @override
   List<Object> get props => super.props..addAll([id!]);
 }
+
+class StudentInAGroupDeleteEvent extends StudentInAGroupBlockEvent {
+  const StudentInAGroupDeleteEvent({required this.id, required this.studentId});
+  final int id;
+  final int studentId;
+
+  @override
+  List<Object> get props => super.props..addAll([id, studentId]);
+}

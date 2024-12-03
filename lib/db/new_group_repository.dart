@@ -1,6 +1,6 @@
-import 'package:assistant/db/constants/student_create_group_constant.dart';
-import 'package:assistant/db/init_db.dart';
-import 'package:assistant/db/models/group_db_models.dart';
+import 'package:TeamLead/db/constants/student_create_group_constant.dart';
+import 'package:TeamLead/db/init_db.dart';
+import 'package:TeamLead/db/models/group_db_models.dart';
 import 'package:sqflite/sqflite.dart';
 
 class NewGroupRepository extends InitDB {

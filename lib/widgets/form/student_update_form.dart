@@ -1,11 +1,11 @@
+import 'package:TeamLead/constants/route_name/route_name.dart';
+import 'package:TeamLead/db/models/student_bd_models.dart';
+import 'package:TeamLead/style/clear_button_style.dart';
+import 'package:TeamLead/widgets/form/validate/validate_phone.dart';
+import 'package:TeamLead/widgets/form/validate/validete_form_fild.dart';
+import 'package:TeamLead/widgets/form/validate/validete_form_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:assistant/constants/route_name/route_name.dart';
-import 'package:assistant/widgets/form/validate/validate_phone.dart';
-import 'package:assistant/widgets/form/validate/validete_form_fild.dart';
-import 'package:assistant/widgets/form/validate/validete_form_text.dart';
-import 'package:assistant/db/models/student_bd_models.dart';
-import 'package:assistant/style/clear_button_style.dart';
 
 class StudentUpdateForm extends StatefulWidget {
   const StudentUpdateForm({Key? key}) : super(key: key);

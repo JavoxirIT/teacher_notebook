@@ -1,6 +1,7 @@
-import 'dart:core';
 import 'dart:async';
-import 'package:assistant/constants/route_name/route_name.dart';
+import 'dart:core';
+
+import 'package:TeamLead/constants/route_name/route_name.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   @override
   void initState() {
-    Timer( const Duration(seconds: 1), () {
+    Timer(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacementNamed(RouteName.homeScreen);
     });
     super.initState();

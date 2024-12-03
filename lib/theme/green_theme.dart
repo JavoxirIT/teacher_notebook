@@ -1,9 +1,9 @@
-import 'package:assistant/style/text_button_style_green.dart';
-import 'package:assistant/theme/style_constant.dart';
-import 'package:assistant/widgets/page_transitions.dart';
-import 'package:assistant/style/outline_button_green_style.dart';
+import 'package:TeamLead/style/elevated_button_theme.dart';
+import 'package:TeamLead/style/outline_button_green_style.dart';
+import 'package:TeamLead/style/text_button_style_green.dart';
+import 'package:TeamLead/theme/color.dart';
+import 'package:TeamLead/widgets/page_transitions.dart';
 import 'package:flutter/material.dart';
-import 'package:assistant/style/elevated_button_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 final greenTheme = ThemeData(
@@ -109,7 +109,7 @@ final greenTheme = ThemeData(
     // shape: RoundedRectangleBorder(
     //   borderRadius: BorderRadius.circular(12.0),
     // ),
-    
+
     margin: EdgeInsets.only(left: 16.0, right: 16.0, top: 5, bottom: 5),
     surfaceTintColor: Color(0xFFF7F7F7),
   ),

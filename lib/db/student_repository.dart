@@ -1,6 +1,6 @@
-import 'package:assistant/db/constants/student_data_constants.dart';
-import 'package:assistant/db/init_db.dart';
-import 'package:assistant/db/models/student_bd_models.dart';
+import 'package:TeamLead/db/constants/student_data_constants.dart';
+import 'package:TeamLead/db/init_db.dart';
+import 'package:TeamLead/db/models/student_bd_models.dart';
 import 'package:sqflite/sqflite.dart';
 
 class StudentRepository extends InitDB {
@@ -58,20 +58,78 @@ class StudentRepository extends InitDB {
   }
 
   // SEARCH
-  Future searchStudent(String input) async {
-    // Database? db = await this.database;
-    // final List<Map<String, dynamic>> studentMapList =
-    //     await db!.query(studentTable);
-    // final List<StudentDB> studentsList = [];
-    // for (var element in studentMapList) {
-    //   studentsList.add(StudentDB.fromMap(element));
-    // }
-    // matches.clear();
-    studentsLists = studentsList.where((e) {
-      return e.studentName.toLowerCase() == input.toLowerCase() ||
-          e.studentSecondName.toLowerCase() == input.toLowerCase() ||
-          e.studentSurName.toLowerCase() == input.toLowerCase();
-    }).toList();
-    return studentsLists;
+  Future<List<StudentDB>> searchStudent(String input) async {
+    studentsList.clear();
+    Database? db = await database;
+    // Подготавливаем строку поиска с подстановочными символами
+    final searchQuery = '%$input%';
+
+    // SQL-запрос для поиска студентов
+    final sql = '''
+    SELECT * 
+    FROM $studentTable
+    WHERE $studentSecondName LIKE ? 
+       OR $studentName LIKE ? 
+       OR $studentSurName LIKE ?
+  ''';
+
+    // Выполнение запроса с передачей параметров
+    final result =
+        await db!.rawQuery(sql, [searchQuery, searchQuery, searchQuery]);
+    if (result.isNotEmpty) {
+      for (var element in result) {
+        studentsList.add(StudentDB.fromMap(element));
+      }
+    }
+    return studentsList;
+  }
+
+  // Метод для получения количества записей (пользователей)
+  Future<int> getStudentCount() async {
+    Database? db = await database;
+    if (db == null) {
+      return 0;
+    }
+
+    // Выполняем запрос для подсчета записей
+    final countData = await db.rawQuery('SELECT COUNT(*) FROM $studentTable');
+
+    // Извлекаем количество строк
+    int count = Sqflite.firstIntValue(countData) ?? 0;
+
+    return count;
+  }
+
+// Метод для получения количества учеников, обучающихся на платной основе
+  Future<int> getStudentCountPay() async {
+    Database? db = await database;
+
+    if (db == null) {
+      return 0;
+    }
+
+    // Выполняем запрос для подсчета учеников, обучающихся на платной основе
+    final countData = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM $studentTable WHERE $studentPayStatus = 1');
+
+    // Извлекаем количество строк
+    int count = countData.isNotEmpty ? countData.first['count'] as int : 0;
+
+    return count;
+  }
+
+  // Метод для получения количества учеников, обучающихся беспдатно
+  Future<int> getStudentCountNotPay() async {
+    Database? db = await database;
+    if (db == null) {
+      return 0;
+    }
+    // Выполняем запрос для подсчета учеников, обучающихся на платной основе
+    final countData = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM $studentTable WHERE $studentPayStatus = 0');
+    // Извлекаем количество строк
+    int count = countData.isNotEmpty ? countData.first['count'] as int : 0;
+
+    return count;
   }
 }

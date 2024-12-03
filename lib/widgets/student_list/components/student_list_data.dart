@@ -1,10 +1,11 @@
-import 'package:assistant/db/student_repository.dart';
-import 'package:assistant/widgets/delete_background_dismiss.dart';
-import 'package:assistant/widgets/secondary_background_dismiss.dart';
+import 'package:TeamLead/constants/route_name/route_name.dart';
+import 'package:TeamLead/db/models/student_bd_models.dart';
+import 'package:TeamLead/db/student_repository.dart';
+import 'package:TeamLead/style/clear_button_style.dart';
+import 'package:TeamLead/widgets/delete_background_dismiss.dart';
+import 'package:TeamLead/widgets/secondary_background_dismiss.dart';
 import 'package:flutter/material.dart';
-import 'package:assistant/constants/route_name/route_name.dart';
-import 'package:assistant/db/models/student_bd_models.dart';
-import 'package:assistant/style/clear_button_style.dart';
+
 // import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'listComponents/list_tile_data.dart';
@@ -49,7 +50,7 @@ Card studentListData(BuildContext context, StudentDB item) {
         return null;
       },
       background: deleteBackgroundDismiss(),
-      secondaryBackground: secondaryBackgroundDismiss(),
+      secondaryBackground: secondaryBackgroundDismiss("Изменить"),
       child: listTileData(item, context),
     ),
   );

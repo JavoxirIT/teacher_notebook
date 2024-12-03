@@ -1,40 +1,39 @@
 import 'dart:convert';
 
-import 'package:assistant/bloc/group_bloc/group_bloc.dart';
-import 'package:assistant/bloc/student_and_group_bloc/student_and_group_list_bloc.dart';
-import 'package:assistant/bloc/student_in_a_group_bloc/student_in_a_group_bloc.dart';
-import 'package:assistant/constants/route_name/route_name.dart';
-import 'package:assistant/db/models/student_group_db_models.dart';
-import 'package:assistant/db/student_add_group_repository.dart';
-import 'package:assistant/style/clear_button_style.dart';
-// import 'package:assistant/widgets/show_snak_bar.dart';
+import 'package:TeamLead/bloc/student_and_group_bloc/student_and_group_list_bloc.dart';
+import 'package:TeamLead/bloc/student_in_a_group_bloc/student_in_a_group_bloc.dart';
+import 'package:TeamLead/constants/route_name/route_name.dart';
+import 'package:TeamLead/db/models/group_db_models.dart';
+import 'package:TeamLead/db/models/student_in_a_group_models.dart';
+import 'package:TeamLead/style/clear_button_style.dart';
+import 'package:TeamLead/theme/color.dart';
+import 'package:TeamLead/widgets/delete_background_dismiss.dart';
+import 'package:TeamLead/widgets/secondary_background_dismiss.dart';
+import 'package:TeamLead/widgets/view/view_widgets/student_add_to_group.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:assistant/db/models/group_db_models.dart';
-import 'package:assistant/theme/style_constant.dart';
+import 'package:intl/intl.dart';
 
-class OneGropList extends StatefulWidget {
-  const OneGropList({super.key});
+class OneGroupList extends StatefulWidget {
+  const OneGroupList({super.key});
 
   @override
-  _OneGropListState createState() => _OneGropListState();
+  State<OneGroupList> createState() => _OneGroupListState();
 }
 
-class _OneGropListState extends State<OneGropList> {
-  List<Map<String, dynamic>> dataUser = [];
-  late GroupDB _group;
+class _OneGroupListState extends State<OneGroupList> {
+  late GroupDB group;
   // late Future<List<StudentGroupDBModels>> dataIsGroup;
 
   @override
   void didChangeDependencies() {
     RouteSettings setting = ModalRoute.of(context)!.settings;
-    _group = setting.arguments as GroupDB;
+    group = setting.arguments as GroupDB;
     BlocProvider.of<StudentAndGroupListBloc>(context)
-        .add(StudentAndGroupLoadEvent(_group.id));
+        .add(StudentAndGroupLoadEvent(group.id));
 
     BlocProvider.of<StudentInAGroupBloc>(context)
-        .add(StudentInAGroupEvent(_group.id));
-    setState(() {});
+        .add(StudentInAGroupEvent(group.id));
     super.didChangeDependencies();
   }
 
@@ -42,17 +41,10 @@ class _OneGropListState extends State<OneGropList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_group.groupName),
+        title: Text(group.groupName),
       ),
-      body: Builder(
-        builder: (context) {
-          final stateStudentAndGroup =
-              context.watch<StudentAndGroupListBloc>().state;
-
-          final studentInAGroupState =
-              context.watch<StudentInAGroupBloc>().state;
-          // debugPrint('data: ${studentInAGroupState}');
-
+      body: BlocBuilder<StudentInAGroupBloc, StudentInAGroupBlockState>(
+        builder: (context, state) {
           return Column(
             children: [
               SizedBox(
@@ -64,11 +56,11 @@ class _OneGropListState extends State<OneGropList> {
                     top: 10.0,
                     bottom: 10.0,
                   ),
-                  child: studentAtToGroup(context, stateStudentAndGroup),
+                  child: StudentAddToGroup(id: group.id!),
                 ),
               ),
               Expanded(
-                child: studentData(context, studentInAGroupState),
+                child: studentData(context, state),
               ),
             ],
           );
@@ -83,9 +75,10 @@ class _OneGropListState extends State<OneGropList> {
         itemCount: state.data.length,
         itemBuilder: (context, i) {
           final item = state.data[i];
+
           return Card(
             child: Dismissible(
-              key: Key(item.studentId.toString()),
+              key: Key(item.id.toString()),
               confirmDismiss: (DismissDirection direction) async {
                 if (direction == DismissDirection.startToEnd) {
                   return await showDialog(
@@ -97,14 +90,21 @@ class _OneGropListState extends State<OneGropList> {
                             "Вы уверены? после удаления данные не восстановить!?"),
                         actions: <Widget>[
                           ElevatedButton(
-                              style: clearButtonStyle,
-                              onPressed: () {
-                                Navigator.of(context).pop(true);
-                                // StudentRepository.db.deleteStudent(item.id);
-                                // BlocProvider.of<StudentBloc>(context)
-                                //     .add(StudentEventLoad());
-                              },
-                              child: const Text("Удалить")),
+                            style: clearButtonStyle,
+                            onPressed: () {
+                              Navigator.of(context).pop(true);
+                              BlocProvider.of<StudentInAGroupBloc>(context).add(
+                                StudentInAGroupDeleteEvent(
+                                  id: item.id,
+                                  studentId: item.studentId,
+                                ),
+                              );
+                              setState(() {
+                                state.data.removeAt(i);
+                              });
+                            },
+                            child: const Text("Удалить"),
+                          ),
                           ElevatedButton(
                             onPressed: () => Navigator.of(context).pop(false),
                             child: const Text("Нет"),
@@ -116,184 +116,198 @@ class _OneGropListState extends State<OneGropList> {
                 } else if (direction == DismissDirection.endToStart) {
                   Navigator.of(context).pushNamed(
                     RouteName.payAdnPayAddView,
-                    arguments: item,
+                    arguments: {"dataStudent": item, "groupId": group.id},
                   );
                 }
                 return null;
               },
-              // background: deleteBackgroundDismiss(),
-              // secondaryBackground: secondaryBackgroundDismiss(),
-              child: ListTile(
-                // splashColor: const Color.fromARGB(255, 251, 189, 4),
-                leading: CircleAvatar(
-                  backgroundColor: colorGreen,
-                  child: ClipOval(
-                      child: item.studentImg != ""
-                          ? Image.memory(
-                              const Base64Decoder().convert(item.studentImg!),
-                              fit: BoxFit.cover,
-                              width: 50,
-                              height: 50,
-                            )
-                          : null),
+              background: deleteBackgroundDismiss(),
+              secondaryBackground: secondaryBackgroundDismiss("Оплата"),
+              child: Container(
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                clipBehavior: Clip.hardEdge,
+                child: Stack(
+                  children: [
+                    // Волна на заднем плане
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: WavePainter(
+                          isStatus(
+                            item,
+                            group.id ?? 0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Сам ListTile
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: colorGreen,
+                        child: ClipOval(
+                          child: item.studentImg != ""
+                              ? Image.memory(
+                                  const Base64Decoder()
+                                      .convert(item.studentImg!),
+                                  fit: BoxFit.cover,
+                                  width: 50,
+                                  height: 50,
+                                )
+                              : null,
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                      ),
+                      title: Text(
+                        item.studentName,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      subtitle: Text(
+                        item.studentPayStatus == 1 ? "Платно" : "Бесплатно",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      onTap: () {
+                        // Действие при нажатии
+                      },
+                    ),
+                  ],
                 ),
-                trailing: const Icon(
-                  Icons.arrow_forward_ios,
-                ),
-                title: Text(item.studentName,
-                    style: Theme.of(context).textTheme.bodyMedium),
-                subtitle: Text(
-                    item.studentPayStatus == 1 ? "Платно" : "Бесплатно",
-                    style: Theme.of(context).textTheme.bodySmall),
-                // onTap: () {
-
-                // },
               ),
             ),
           );
         },
       );
     }
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
-  }
-
-  Future<List<StudentGroupDBModels>> getData() async =>
-      await StudentAddGroupRepository.db.getDataGroup();
-
-  TextButton studentAtToGroup(
-      BuildContext context, StudentAndGroupListState state) {
-    return TextButton(
-      child: Row(
+    if (state is StudentInAGroupBlockInitial) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Padding(
-              padding: EdgeInsets.only(right: 15.0),
-              child: Icon(Icons.person_add_outlined)),
           Text(
-            "Добавить участника",
-            style: Theme.of(context).textTheme.bodyMedium,
+            "Группа пуста",
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              "добавьте участников",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
           ),
         ],
       ),
-      onPressed: () => {
-        state is StudentAndGroupLoadState
-            ? showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (BuildContext context) {
-                  return StatefulBuilder(
-                      builder: (BuildContext context, StateSetter setState) {
-                    return FractionallySizedBox(
-                      heightFactor: 0.9,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      dataUser.clear();
-                                      Navigator.of(context).pop(true);
-                                    },
-                                    child: Text(
-                                      "Отмена",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.all(20.0),
-                                    child: Text("Ученики"),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => {
-                                      if (dataUser.isNotEmpty)
-                                        {
-                                          sendData(),
-                                        }
-                                    },
-                                    child: Text(
-                                      "Готово",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
-                                    ),
-                                  ),
-                                ]),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: state.data.length,
-                              // separatorBuilder: (context, index) =>
-                              //     const Divider(color: Color.fromARGB(255, 145, 145, 145)),
-
-                              itemBuilder: (context, index) {
-                                final student = state.data[index];
-                                return CheckboxListTile(
-                                  tileColor: student.isSelected == true
-                                      ? coloR0xFFDAE3E4
-                                      : null,
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                  title: Text(
-                                    '${student.studentName} ${student.studentSurName}',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                  value: student.isSelected,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      student.isSelected = value;
-                                      addDataToList(student.studentsId,
-                                          student.groupId, value);
-                                    });
-                                  },
-                                  checkColor: colorGreen,
-                                  activeColor: colorWhite,
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  });
-                },
-              )
-            : state is GroupStateLoading
-                ? const Text("Загрузка....")
-                : null
-      },
     );
   }
 
-  void addDataToList(studentsId, groupId, isSelected) {
-    final Map<String, dynamic> data = {
-      'id': null,
-      "studentId": studentsId,
-      'groupId': groupId,
-      'isSelected': isSelected
-    };
+  isStatus(StudentInAGroupModels item, int groupId) {
+    final formater = DateFormat("MM/yyyy");
+    DateTime date = DateTime.now();
+    String todaysDay = formater.format(date);
+    String studeInsetGroupStartData = formater
+        .format(DateTime.fromMillisecondsSinceEpoch(item.startingDate * 1000));
+    String lastPaymentDate = formater.format(
+        DateTime.fromMillisecondsSinceEpoch(
+            item.lastPaymentDateTimeStamp * 1000));
+    int? lastPaymentInGroup = item.lastPaymentInGroup;
 
-    if (data['isSelected'] == true) {
-      dataUser.add(data);
-    } else if (data['isSelected'] == false) {
-      dataUser
-          .removeWhere((element) => element['studentId'] == data['studentId']);
+    // bool isDataResult =
+    //     formater.parse(todaysDay).isAfter(formater.parse(lastPaymentDate));
+
+    bool isDataResult2 =
+        formater.parse(todaysDay).isAfter(formater.parse(lastPaymentDate));
+
+    bool isEquals = formater
+        .parse(lastPaymentDate)
+        .isAtSameMomentAs(formater.parse(todaysDay));
+
+    if (item.studentPayStatus == 1) {
+      // if (lastPaymentInGroup == groupId) {
+      if (isDataResult2) {
+        return Colors.red[200];
+      } else if (isEquals) {
+        return colorBlue;
+      }
+      // }
     }
+    return colorGrey200;
+  }
+}
+
+class WavePainter extends CustomPainter {
+  final Color waveColor;
+
+  WavePainter(this.waveColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = waveColor
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, 0); // Верхняя часть
+    // path.quadraticBezierTo(
+    //     size.width * 1.4, size.height * 0.4, 0, size.height * 1);
+
+    path.quadraticBezierTo(size.width * 1.3, size.height * 0.4, 0,
+        size.height * 3); // Большая волна
+    path.close();
+
+    canvas.drawPath(path, paint);
   }
 
-  void sendData() {
-    for (var i = 0; i < dataUser.length; i++) {
-      StudentAddGroupRepository.db.addStudentToGroop(
-        StudentGroupDBModels(
-            studentId: dataUser[i]["studentId"],
-            groupId: dataUser[i]["groupId"]),
-      );
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false; // Перерисовка не нужна, если данные остаются неизменными
+  }
+}
+
+class ZigZagWavePainter extends CustomPainter {
+  final Color waveColor;
+
+  ZigZagWavePainter(this.waveColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = waveColor
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, 0); // Начало сверху
+
+    // Создаем зигзаг
+    const double zigZagHeight = 20; // Высота одного зигзага
+    const double zigZagWidth = 30; // Ширина одного зигзага
+    double currentX = 0;
+    bool goingDown = true;
+
+    while (currentX < size.width) {
+      if (goingDown) {
+        path.lineTo(currentX, zigZagHeight);
+      } else {
+        path.lineTo(currentX, 0);
+      }
+      currentX += zigZagWidth;
+      goingDown = !goingDown;
     }
+
+    // Завершаем волну
+    path.lineTo(size.width, size.height); // Вниз вправо
+    path.lineTo(0, size.height); // Вниз влево
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false; // Перерисовка не нужна, если данные остаются неизменными
   }
 }

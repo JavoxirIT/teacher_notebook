@@ -1,9 +1,9 @@
-import 'package:assistant/bloc/group_bloc/group_bloc.dart';
-import 'package:assistant/db/models/group_db_models.dart';
-import 'package:assistant/widgets/form/group_add_and_update_form.dart';
+import 'package:TeamLead/bloc/group_bloc/group_bloc.dart';
+import 'package:TeamLead/db/models/group_db_models.dart';
+import 'package:TeamLead/navigation/drawer_menu.dart';
+import 'package:TeamLead/widgets/form/group_add_and_update_form.dart';
+import 'package:TeamLead/widgets/form/student_add_form.dart';
 import 'package:flutter/material.dart';
-import 'package:assistant/widgets/form/student_add_form.dart';
-import 'package:assistant/navigation/drawer_menu.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

@@ -1,5 +1,5 @@
-import 'package:assistant/db/payments_repository.dart';
-import 'package:assistant/db/models/payments_db_models.dart';
+import 'package:TeamLead/db/models/payments_db_models.dart';
+import 'package:TeamLead/db/payments_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -16,7 +16,8 @@ class PaymentsBloc extends Bloc<PaymentsEvent, PaymentsState> {
   Future<void> _loadPaymentData(
       PaymentsEventLoad event, Emitter<PaymentsState> emit) async {
     try {
-      final loadedPayments = await _paysRepository.queryAll();
+      final loadedPayments =
+          await _paysRepository.queryAll(event.month, event.year);
 
       if (loadedPayments.isEmpty) {
         emit(PaymentsNoDataState());

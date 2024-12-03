@@ -1,7 +1,7 @@
+import 'package:TeamLead/navigation/drawer_menu.dart';
+import 'package:TeamLead/widgets/search.dart';
+import 'package:TeamLead/widgets/student_list/general_list_of_students.dart';
 import 'package:flutter/material.dart';
-import 'package:assistant/widgets/search.dart';
-import 'package:assistant/widgets/student_list/general_list_of_students.dart';
-import 'package:assistant/navigation/drawer_menu.dart';
 
 class StudentsScreen extends StatelessWidget {
   const StudentsScreen({super.key});

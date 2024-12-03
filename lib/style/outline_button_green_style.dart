@@ -4,7 +4,7 @@ const greenCustomColor = Color.fromRGBO(39, 174, 96, 1);
 
 final ButtonStyle outlineButtonGreenStyle = ElevatedButton.styleFrom(
   foregroundColor: Colors.white,
-  backgroundColor: greenCustomColor,
+  // backgroundColor: greenCustomColor,
   minimumSize: const Size(88, 36),
   padding: const EdgeInsets.symmetric(horizontal: 16),
   shape: const RoundedRectangleBorder(
@@ -13,9 +13,9 @@ final ButtonStyle outlineButtonGreenStyle = ElevatedButton.styleFrom(
     ),
   ),
   textStyle: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),
-  shadowColor: greenCustomColor,
+  // shadowColor: greenCustomColor,
   side: const BorderSide(
-    color: greenCustomColor,
+    // color: greenCustomColor,
   ),
   elevation: 7.0,
 );

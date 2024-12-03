@@ -1,5 +1,5 @@
-import 'package:assistant/db/new_group_repository.dart';
-import 'package:assistant/db/models/group_db_models.dart';
+import 'package:TeamLead/db/models/group_db_models.dart';
+import 'package:TeamLead/db/new_group_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,6 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     on<GroupEventLoad>(_loadGroup);
     on<GroupEventDelete>(_deleteGroup);
     on<GroupEventAddAndUpdate>(_insertandUpdate);
-  
   }
   final NewGroupRepository _groupRepository;
   late List<GroupDB> dataGroup;
@@ -61,6 +60,4 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       emit(GroupErrorState(exception: e));
     }
   }
-
-
 }

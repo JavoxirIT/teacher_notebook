@@ -1,7 +1,9 @@
+import 'package:TeamLead/theme/color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-Future<void> showCupModalPopup(Widget child, BuildContext context) {
+Future<void> showCupModalPopup(
+    Widget child, BuildContext context, double height) {
   return showCupertinoModalPopup(
     context: context,
     builder: (BuildContext context) => Container(
@@ -10,17 +12,26 @@ Future<void> showCupModalPopup(Widget child, BuildContext context) {
       // margin: EdgeInsets.only(
       //   bottom: MediaQuery.of(context).viewInsets.bottom,
       // ),
-      color: const Color.fromARGB(255, 31, 31, 31),
+      // color: colorGrey200,
       // Use a SafeArea widget to avoid system overlaps.
-
-      height: MediaQuery.of(context).size.height / 3,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(
+            20.0,
+          ),
+          topRight: Radius.circular(
+            20.0,
+          ),
+        ),
+        color: colorBlue,
+      ),
+      height: height,
       child: CupertinoTheme(
         data: const CupertinoThemeData(
           textTheme: CupertinoTextThemeData(
-            dateTimePickerTextStyle:
-                TextStyle(color: Colors.white, fontSize: 18.0),
+            dateTimePickerTextStyle: TextStyle(color: colorRed, fontSize: 24.0),
           ),
-          // brightness: Brightness.dark
+          // brightness: Brightness.dark,
           barBackgroundColor: Colors.amber,
         ),
         child: child,

@@ -9,4 +9,5 @@ class RouteName {
   static const oneStudentView = "/one-user-view";
   static const oneGroupListView = "/one-group-view";
   static const groupUpdateAddForm = "/group-add-update-form";
+  static const settingView = "/setting-view";
 }

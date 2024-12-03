@@ -1,14 +1,15 @@
-import 'package:assistant/constants/route_name/route_name.dart';
-import 'package:assistant/screen/payments_screen.dart';
-import 'package:assistant/widgets/form/group_add_and_update_form.dart';
-import 'package:assistant/widgets/form/student_update_form.dart';
-import 'package:assistant/widgets/view/one_grop_list.dart';
-import 'package:assistant/widgets/view/one_students_view.dart';
-import 'package:assistant/screen/add_students_screen.dart';
-import 'package:assistant/screen/home_screen.dart';
-import 'package:assistant/screen/students_local_db_data.dart';
-import 'package:assistant/screen/students_screen.dart';
-import 'package:assistant/widgets/view/pay_%20and_add_pay_one_student.dart';
+import 'package:TeamLead/constants/route_name/route_name.dart';
+import 'package:TeamLead/screen/add_students_screen.dart';
+import 'package:TeamLead/screen/home_screen.dart';
+import 'package:TeamLead/screen/payments_screen.dart';
+import 'package:TeamLead/screen/setting_view.dart';
+import 'package:TeamLead/screen/students_local_db_data.dart';
+import 'package:TeamLead/screen/students_screen.dart';
+import 'package:TeamLead/widgets/form/group_add_and_update_form.dart';
+import 'package:TeamLead/widgets/form/student_update_form.dart';
+import 'package:TeamLead/widgets/view/one_grop_list.dart';
+import 'package:TeamLead/widgets/view/one_students_view.dart';
+import 'package:TeamLead/widgets/view/pay_%20and_add_pay_one_student.dart';
 
 final routers = {
   RouteName.homeScreen: (_) => const HomeScreen(),
@@ -19,6 +20,7 @@ final routers = {
   RouteName.localSudentUpdate: (_) => const StudentUpdateForm(),
   RouteName.paymentsScreen: (_) => const PaymentsScreen(),
   RouteName.payAdnPayAddView: (_) => const PayAndAddPayOneStudent(),
-  RouteName.oneGroupListView: (_) => const OneGropList(),
+  RouteName.oneGroupListView: (_) => const OneGroupList(),
   RouteName.groupUpdateAddForm: (_) => const GroupAddForm(),
+  RouteName.settingView: (_) => const SettingView()
 };

@@ -1,5 +1,5 @@
+import 'package:TeamLead/repositories/models/student_model.dart';
 import 'package:dio/dio.dart';
-import 'package:assistant/repositories/models/student_model.dart';
 
 class StudentListRepository {
   // static List<StudentModel> parse(responseBody) {

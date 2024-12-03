@@ -1,16 +1,12 @@
 import 'dart:io';
 
-import 'package:assistant/bloc/theme_bloc/theme_bloc_bloc.dart';
-import 'package:assistant/style/outline_button_theme_danger.dart';
-import 'package:assistant/theme/dark_theme.dart';
-import 'package:assistant/theme/green_theme.dart';
-import 'package:assistant/theme/light_theme.dart';
+import 'package:TeamLead/bloc/theme/theme_cubit.dart';
+import 'package:TeamLead/constants/route_name/route_name.dart';
+import 'package:TeamLead/style/outline_button_theme_danger.dart';
 import 'package:flutter/material.dart';
-import 'package:assistant/constants/route_name/route_name.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerList extends StatefulWidget {
   const DrawerList({
@@ -22,30 +18,20 @@ class DrawerList extends StatefulWidget {
 }
 
 class _DrawerListState extends State<DrawerList> {
-  SharedPreferences? _pref;
-  static const String keyThemeBoll = "theme_bool";
-  bool boolData = true;
-
   final dartThemeIcon = const Icon(Icons.mode_night_outlined);
   final lightThemeIcon = const Icon(Icons.sunny);
 
   @override
-  void initState() {
-    super.initState();
-    SharedPreferences.getInstance().then((value) {
-      setState(() => _pref = value);
-      _loadedBollData();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final isTheme = context.watch<ThemeCubit>().state.isTheme;
     return Column(
       children: [
         UserAccountsDrawerHeader(
           // accountName:  Text("Хасанов Жавохир", style: Theme.of(context).textTheme.bodyMedium),
-          accountName: Text("Хасанов Жавохир",
-              style: Theme.of(context).textTheme.titleSmall),
+          accountName: Text(
+            "",
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           accountEmail: const Text(""),
           currentAccountPicture: CircleAvatar(
             child: ClipOval(
@@ -59,6 +45,9 @@ class _DrawerListState extends State<DrawerList> {
               fit: BoxFit.cover,
             ),
           ),
+          // onDetailsPressed: () {
+          //   log("click");
+          // },
         ),
         Expanded(
           child: Column(
@@ -109,7 +98,7 @@ class _DrawerListState extends State<DrawerList> {
                   leading: const Icon(
                     FontAwesomeIcons.users,
                   ),
-                  title: Text("Учиники",
+                  title: Text("Ученики",
                       style: Theme.of(context).textTheme.titleSmall),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -131,6 +120,18 @@ class _DrawerListState extends State<DrawerList> {
                   },
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: ListTile(
+                  leading: const FaIcon(FontAwesomeIcons.gear),
+                  title: Text("Настройки",
+                      style: Theme.of(context).textTheme.titleSmall),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushNamed(RouteName.settingView);
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -144,20 +145,12 @@ class _DrawerListState extends State<DrawerList> {
                 Padding(
                   padding: const EdgeInsets.only(left: 15.0),
                   child: ListTile(
-                    leading: boolData ? dartThemeIcon : lightThemeIcon,
+                    leading: isTheme ? dartThemeIcon : lightThemeIcon,
                     title: Text('Сменить тему',
                         style: Theme.of(context).textTheme.titleSmall),
                     onTap: () {
-                      BlocProvider.of<ThemeBlocBloc>(context).add(
-                        ThemeAddEvent(
-                            theme: boolData
-                                ? lightTheme
-                                : boolData == true
-                                    ? darkTheme
-                                    : greenTheme),
-                      );
-                      boolData = !boolData;
-                      // _setBollPref(!boolData);
+                      context.read<ThemeCubit>().setThemeBrightness(
+                          isTheme ? Brightness.light : Brightness.dark);
                     },
                   ),
                 ),
@@ -190,13 +183,6 @@ class _DrawerListState extends State<DrawerList> {
   //   _loadedBollData();
   // }
 
-  void _loadedBollData() {
-    setState(() {
-      boolData = _pref!.getBool(keyThemeBoll) ?? true;
-      // debugPrint("$boolData");
-    });
-  }
-
   void showModal(BuildContext context) => showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
@@ -217,13 +203,13 @@ class _DrawerListState extends State<DrawerList> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Text(
                       "Вы действительно хотите выйти из приложения?",
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
-                  ButtonBar(
+                  OverflowBar(
                     children: [
                       OutlinedButton(
                         style: outlineButtonStyleDanger,
