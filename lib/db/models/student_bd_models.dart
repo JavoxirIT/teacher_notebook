@@ -1,5 +1,4 @@
 class StudentDB {
-
   StudentDB(
     this.id,
     this.studentName,
@@ -34,7 +33,6 @@ class StudentDB {
   late int? studentGroupId = 0;
   late String studentGroupName;
   late int? studentGroupStatus = 0;
-
 
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};
@@ -75,5 +73,12 @@ class StudentDB {
     studentGroupId = map["studentGroupId"];
     studentGroupStatus = map["studentGroupStatus"];
     // studentGroupName = map["name"];
+  }
+  @override
+  String toString() {
+    return 'StudentDB(id: $id, studentName: $studentName, studentSecondName: $studentSecondName, studentSurName: $studentSurName '
+        'studentBrithDay: $studentBrithDay, studentAddres: $studentAddres, studentPhone: $studentPhone, studentPayStatus: $studentPayStatus '
+        ' studentSchoolAndClassNumber: $studentSchoolAndClassNumber, studentDocumentNomer: $studentDocumentNomer, studentParentsFio: $studentParentsFio '
+        'studentParentsPhone: $studentParentsPhone,  studentGroupId: $studentGroupId, studentGroupStatus: $studentGroupStatus)';
   }
 }

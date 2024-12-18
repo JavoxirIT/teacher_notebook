@@ -16,8 +16,10 @@ class OneStudentPaymentsData extends StatefulWidget {
 class _OneStudentPaymentsDataState extends State<OneStudentPaymentsData> {
   @override
   void initState() {
+    // log("one pay: ${widget.studentId}");
     BlocProvider.of<PaymentsBloc>(context)
         .add(PaymentsOneStudentEventLoad(id: widget.studentId));
+
     super.initState();
   }
 

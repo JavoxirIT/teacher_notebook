@@ -19,10 +19,12 @@ class PaymentsOneStudentEventLoad extends PaymentsEvent {
 }
 
 class PaymentsEventLoad extends PaymentsEvent {
-  const PaymentsEventLoad({ this.month,  this.year});
+  const PaymentsEventLoad({this.month, this.year});
   final String? month;
   final String? year;
 
   @override
   List<Object> get props => super.props..addAll([month!, year!]);
 }
+
+class PaymentsEventInitial extends PaymentsEvent {}

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:TeamLead/db/constants/student_data_constants.dart';
 import 'package:TeamLead/db/init_db.dart';
 import 'package:TeamLead/db/models/student_bd_models.dart';
@@ -23,6 +25,7 @@ class StudentRepository extends InitDB {
     for (var element in studentMapList) {
       studentsList.add(StudentDB.fromMap(element));
     }
+    log(studentsList.toString());
     // if (studentsLists.isEmpty) return  studentsList;
     return studentsList;
   }
@@ -30,10 +33,14 @@ class StudentRepository extends InitDB {
   // 'SELECT  $studentTable.studentName, $studentTable.studentSurName, $paysTable.student_id, $paysTable.summa, $paysTable.date, $paysTable.id  FROM $paysTable inner join $studentTable  on  $studentTable.id = $paysTable.student_id'
 
 // INSERT
-  Future<StudentDB> insertStudent(StudentDB student) async {
+  Future<String> insertStudent(StudentDB student) async {
     Database? db = await database;
     student.id = await db!.insert(studentTable, student.toMap());
-    return student;
+    log("$student");
+    if (student.id != null) {
+      return "success";
+    }
+    return 'error';
   }
 
 // UPDATE

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:TeamLead/screen/home_screen.dart';
 import 'package:TeamLead/theme/dark_theme.dart';
 import 'package:TeamLead/theme/light_theme.dart';
@@ -20,8 +22,13 @@ import 'setting/setting_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  runApp(MyApp(preferences: prefs));
+
+  try {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    runApp(MyApp(preferences: prefs));
+  } catch (e) {
+    log('SharedPreferences ERROR $e');
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -75,7 +82,7 @@ class _AppThemeState extends State<AppTheme> {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {
         return MaterialApp(
-          home: HomeScreen(),
+          home: const HomeScreen(),
           theme: state.isTheme ? darkTheme : lightTheme,
           routes: routers,
         );

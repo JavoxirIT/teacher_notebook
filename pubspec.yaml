@@ -1,5 +1,5 @@
 name: TeamLead
-description: "A new Flutter module project."
+description: "my first mobile app"
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -33,24 +33,24 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   sqflite: ^2.3.2
   path_provider: ^2.1.2
-  flutter_phone_direct_caller: ^2.1.1
+#  flutter_phone_direct_caller: ^2.1.1
   provider: ^6.1.1
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.2
   flutter_bloc: ^8.1.4
   equatable: ^2.0.5
-  shared_preferences: ^2.3.2
+  shared_preferences: ^2.3.3
   bloc: ^8.1.3
-  carousel_slider: ^4.2.1
-  camera: ^0.10.5+9
-  intl: ^0.19.0
+  carousel_slider: ^5.0.0
+  camera: ^0.11.0+2
+  intl: ^0.20.1
   google_fonts: ^6.1.0
-  multi_dropdown: ^2.1.4
+  multi_dropdown: ^3.0.1
   gap: ^3.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
+  flutter_lints: ^5.0.0
 
 # flutter_launcher_icons:
 #   # android: "launcher_icon"
@@ -114,5 +114,5 @@ flutter:
   # identifiers, which may be completely independent or the same as these.
   module:
     androidX: true
-    androidPackage: com.example.assistents
-    iosBundleIdentifier: com.example.assistents
+    androidPackage: uz.xj.assistant
+    iosBundleIdentifier: uz.xj.assistant

@@ -87,7 +87,7 @@ class _OneGroupListState extends State<OneGroupList> {
         itemCount: state.data.length,
         itemBuilder: (context, i) {
           final item = state.data[i];
-
+          // log('item::::::::::${item}');
           return Card(
             child: Dismissible(
               key: Key(item.id.toString()),
@@ -172,8 +172,8 @@ class _OneGroupListState extends State<OneGroupList> {
                         Icons.arrow_forward_ios,
                       ),
                       title: Text(
-                        item.studentName,
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        "${item.studentSurName} ${item.studentName}",
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       subtitle: Text(
                         item.studentPayStatus == 1 ? "Платно" : "Бесплатно",
@@ -267,7 +267,7 @@ class WavePainter extends CustomPainter {
     // path.quadraticBezierTo(
     //     size.width * 1.4, size.height * 0.4, 0, size.height * 1);
 
-    path.quadraticBezierTo(size.width * 1.3, size.height * 0.4, 0,
+    path.quadraticBezierTo(size.width * 0.35, size.height * 0.2, 0,
         size.height * 3); // Большая волна
     path.close();
 

@@ -1,4 +1,3 @@
-import 'package:TeamLead/db/models/student_bd_models.dart';
 import 'package:TeamLead/db/models/student_in_a_group_models.dart';
 import 'package:TeamLead/widgets/form/payments_form.dart';
 import 'package:TeamLead/widgets/view/one_student_payments_data.dart';
@@ -20,12 +19,7 @@ class _PayAndAddPayOneStudentState extends State<PayAndAddPayOneStudent> {
   @override
   void didChangeDependencies() {
     RouteSettings setting = ModalRoute.of(context)!.settings;
-
-    if (setting.arguments is StudentDB) {
-      _userData = setting.arguments as StudentDB;
-      _studentId = _userData.id;
-      // log('_PayAndAddPayOneStudentState StudentDB: ${_userData.id}');
-    } else if (setting.arguments is Map<String, dynamic>) {
+    if (setting.arguments is Map<String, dynamic>) {
       Map<String, dynamic> data = setting.arguments as Map<String, dynamic>;
       _userData = data['dataStudent'] as StudentInAGroupModels;
       _studentId = _userData.studentId;
@@ -67,7 +61,11 @@ class _PayAndAddPayOneStudentState extends State<PayAndAddPayOneStudent> {
         ),
         body: TabBarView(
           children: [
-            PaymentsForm(_userData, _groupId, _studentId!),
+            PaymentsForm(
+              userData: _userData,
+              groupId: _groupId!,
+              studentId: _studentId!,
+            ),
             OneStudentPaymentsData(studentId: _studentId!),
           ],
         ),

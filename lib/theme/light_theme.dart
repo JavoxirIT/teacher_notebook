@@ -79,11 +79,11 @@ final lightTheme = ThemeData(
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8), // Для неактивного состояния
-      borderSide: BorderSide(color: darkGrey),
+      borderSide: const BorderSide(color: darkGrey),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8), // Для активного состояния
-      borderSide: BorderSide(color: darkGrey, width: 2),
+      borderSide: const BorderSide(color: darkGrey, width: 2),
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(

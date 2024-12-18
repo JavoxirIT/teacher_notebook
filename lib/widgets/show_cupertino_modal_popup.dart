@@ -29,7 +29,8 @@ Future<void> showCupModalPopup(
       child: CupertinoTheme(
         data: const CupertinoThemeData(
           textTheme: CupertinoTextThemeData(
-            dateTimePickerTextStyle: TextStyle(color: colorRed, fontSize: 24.0),
+            dateTimePickerTextStyle:
+                TextStyle(color: colorWhite, fontSize: 24.0),
           ),
           // brightness: Brightness.dark,
           barBackgroundColor: Colors.amber,

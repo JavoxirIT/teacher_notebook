@@ -13,7 +13,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackInfoBar(
             .headlineLarge!
             .copyWith(color: Colors.red),
       ),
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 5),
     ),
   );
 }

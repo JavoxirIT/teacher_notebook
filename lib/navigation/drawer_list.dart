@@ -35,7 +35,7 @@ class _DrawerListState extends State<DrawerList> {
           accountEmail: const Text(""),
           currentAccountPicture: CircleAvatar(
             child: ClipOval(
-              child: Image.asset('assets/images/aka.jpg'),
+              child: Icon(Icons.man),
             ),
           ),
           decoration: const BoxDecoration(

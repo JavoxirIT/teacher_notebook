@@ -134,7 +134,7 @@ final greenTheme = ThemeData(
     indicatorColor: colorWhite,
     dividerHeight: BorderSide.strokeAlignCenter,
     labelColor: colorWhite,
-    overlayColor: MaterialStatePropertyAll(iconGreenColor),
+    overlayColor: WidgetStatePropertyAll(iconGreenColor),
     unselectedLabelColor: Color.fromARGB(255, 25, 163, 136),
     // dividerColor: Colors.blueAccent
   ),

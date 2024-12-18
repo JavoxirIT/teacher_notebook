@@ -6,6 +6,7 @@ import 'package:TeamLead/theme/color.dart';
 import 'package:flutter/material.dart';
 
 ListTile listTileData(StudentDB item, BuildContext context) {
+  // log('${item.toString()}');
   return ListTile(
     // splashColor: const Color.fromARGB(255, 251, 189, 4),
     leading: CircleAvatar(

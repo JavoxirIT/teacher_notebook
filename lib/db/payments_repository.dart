@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:TeamLead/db/constants/student_data_constants.dart';
 import 'package:TeamLead/db/constants/student_pays_constants.dart';
 import 'package:TeamLead/db/init_db.dart';
@@ -11,10 +13,19 @@ class PaysRepository extends InitDB {
   late final List<PaymentsDB> paymentsOne = [];
 
   // INSERT PAYMENTS
-  Future<PaymentsDB> insertStudentPayments(PaymentsDB payment) async {
-    Database? db = await database;
-    payment.paysId = await db!.insert(paysTable, payment.toMap());
-    return payment;
+  Future<String> insertStudentPayments(PaymentsDB payment) async {
+    try {
+      Database? db = await database;
+      payment.paysId = await db!.insert(paysTable, payment.toMap());
+      log('insertStudentPayments: $payment');
+      if (payment.paysId != null) {
+        return "success";
+      }
+      return "error";
+    } catch (e) {
+      log("Ошибка в INSERT PAYMENTS: $e");
+      throw Exception("Ошибка в INSERT PAYMENTS: $e");
+    }
   }
 
   // READ ALL
@@ -99,11 +110,12 @@ class PaysRepository extends InitDB {
         groupedData[key] = [payment];
       }
     }
+    // log('groupedData: $groupedData');
     return groupedData;
   }
 
   Future<List<PaymentsDB>> queryOne(int id) async {
-    // log('PaymentsDB, $id');
+    log('PaymentsDB, $id');
     paymentsOne.clear();
     Database? db = await database;
     final List<Map<String, dynamic>> studentPaymentData = await db!.rawQuery(
@@ -115,7 +127,7 @@ class PaysRepository extends InitDB {
     for (var element in studentPaymentData) {
       paymentsOne.add(PaymentsDB.fromMap(element));
     }
-    // log(paymentsOne.toString());
+    log(paymentsOne.toString());
     return paymentsOne;
   }
 }

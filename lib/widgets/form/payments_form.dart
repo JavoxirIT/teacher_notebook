@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:TeamLead/bloc/student_bloc/student_bloc.dart';
 import 'package:TeamLead/db/models/one_student_in_groups.dart';
 // import 'package:TeamLead/db/models/student_bd_models.dart';
 import 'package:TeamLead/db/models/payments_db_models.dart';
+import 'package:TeamLead/db/models/student_in_a_group_models.dart';
 import 'package:TeamLead/db/payments_repository.dart';
 import 'package:TeamLead/db/student_add_group_repository.dart';
 import 'package:TeamLead/style/clear_button_style.dart';
@@ -16,11 +19,15 @@ import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 
 class PaymentsForm extends StatefulWidget {
-  const PaymentsForm(this._userData, this._groupId, this._studentId,
-      {super.key});
-  final _userData;
-  final int? _groupId;
-  final int _studentId;
+  const PaymentsForm({
+    required this.userData,
+    required this.groupId,
+    required this.studentId,
+    super.key,
+  });
+  final StudentInAGroupModels userData;
+  final int groupId;
+  final int studentId;
 
   @override
   PaymentsFormState createState() => PaymentsFormState();
@@ -50,34 +57,12 @@ class PaymentsFormState extends State<PaymentsForm> {
 
   @override
   void initState() {
-    getStudentListGroup(widget._studentId);
+    getStudentListGroup(widget.studentId);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget._groupId == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              "Добавьте студента в группу",
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(
-                "после сможете добавить оплату",
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -121,7 +106,7 @@ class PaymentsFormState extends State<PaymentsForm> {
                   },
                 ),
               ),
-              widget._groupId == null
+              widget.groupId == null
                   ? Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20.0,
@@ -262,8 +247,8 @@ class PaymentsFormState extends State<PaymentsForm> {
             child: Table(
               children: <TableRow>[
                 tableRow(context, "Сумма оплаты:", pay),
-                tableRow(
-                    context, "Дата оплаты:", '${days!}/${months!}/${years!}'),
+                tableRow(context, "Дата оплаты:",
+                    '${day ?? days}/${month ?? months}/${year ?? years}'),
               ],
             ),
           ),
@@ -280,7 +265,6 @@ class PaymentsFormState extends State<PaymentsForm> {
                 formSubmit();
                 Navigator.of(context).pop(true);
                 // Navigator.of(context).pushNamed(RouteName.localStudent);
-                BlocProvider.of<StudentBloc>(context).add(StudentEventLoad());
               },
               child: const Text("Сохранить"),
             ),
@@ -290,25 +274,38 @@ class PaymentsFormState extends State<PaymentsForm> {
     );
   }
 
-  void formSubmit() {
+  void formSubmit() async {
     var info = DateFormat('dd/MM/yyyy').format(date).split("/");
     String days = info[0];
     String months = info[1];
     String years = info[2];
     int timestampSecondsDefault = date.millisecondsSinceEpoch ~/ 1000;
+    // log("payments: ${int.parse(_payValue.text)}");
+    // log("studentId: ${widget._userData.id!}");
     _formKey.currentState?.save();
-    PaysRepository().insertStudentPayments(
-      PaymentsDB(
-        payments: int.parse(_payValue.text),
-        day: day ?? days,
-        month: month ?? months,
-        year: year ?? years,
-        studentId: widget._userData.id!,
-        timestampSeconds: timestampSeconds ?? timestampSecondsDefault,
-        forWhichGroupId:
-            widget._groupId ?? oneStudentInGroup[_selectedGroup].groupId,
-      ),
-    );
-    showSnackInfoBar(context, 'Данные сохранены');
+    try {
+      String result = await PaysRepository().insertStudentPayments(
+        PaymentsDB(
+          payments: int.parse(_payValue.text),
+          day: day ?? days,
+          month: month ?? months,
+          year: year ?? years,
+          studentId: widget.studentId,
+          timestampSeconds: timestampSeconds ?? timestampSecondsDefault,
+          forWhichGroupId:
+              widget.groupId ?? oneStudentInGroup[_selectedGroup].groupId,
+        ),
+      );
+
+      if (result == "success") {
+        showSnackInfoBar(context, 'Данные сохранены');
+        BlocProvider.of<StudentBloc>(context).add(StudentEventLoad());
+      }
+      if (result == "error") {
+        showSnackInfoBar(context, 'Ошибка при сохранении');
+      }
+    } catch (e) {
+      log("error: $e");
+    }
   }
 }

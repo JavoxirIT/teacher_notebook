@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 class PreviewPage extends StatelessWidget {
-  const PreviewPage({Key? key, required this.picture}) : super(key: key);
+  const PreviewPage({super.key, required this.picture});
 
   final XFile picture;
 

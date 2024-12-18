@@ -4,7 +4,7 @@ import 'package:TeamLead/constants/route_name/route_name.dart';
 import 'package:TeamLead/db/models/student_bd_models.dart';
 import 'package:TeamLead/theme/color.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+// import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:gap/gap.dart';
 
 class OneStudentsView extends StatefulWidget {
@@ -26,9 +26,9 @@ class _OneStudentsViewState extends State<OneStudentsView> {
     super.didChangeDependencies();
   }
 
-  void _callNumber() {
-    FlutterPhoneDirectCaller.callNumber(_userData.studentPhone);
-  }
+  // void _callNumber() {
+  //   FlutterPhoneDirectCaller.callNumber(_userData.studentPhone);
+  // }
 
   dataPayStatus() {
     if (_userData.studentPayStatus == 1) {
@@ -54,21 +54,23 @@ class _OneStudentsViewState extends State<OneStudentsView> {
       ),
     );
 
+    final bodyLarge = Theme.of(context).textTheme.bodyLarge;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorBlue,
         actions: [
-          OutlinedButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(
-                RouteName.payAdnPayAddView,
-                arguments: _userData,
-              );
-            },
-            style: buttonStyle,
-            child: const Text("Добавить оплату"),
-          ),
-          const Gap(10.0),
+          // OutlinedButton(
+          //   onPressed: () {
+          //     Navigator.of(context).pushNamed(
+          //       RouteName.payAdnPayAddView,
+          //       arguments: _userData,
+          //     );
+          //   },
+          //   style: buttonStyle,
+          //   child: const Text("Добавить оплату"),
+          // ),
+          // const Gap(10.0),
           OutlinedButton(
             onPressed: () {
               Navigator.of(context).pushNamed(
@@ -102,7 +104,11 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                               width: 150,
                               height: 150,
                             )
-                          : null,
+                          : Icon(
+                              Icons.no_accounts,
+                              size: 150,
+                              color: colorBlue,
+                            ),
                     ),
                   ),
                 ),
@@ -138,7 +144,7 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                   TableCell(
                     child: Text(
                       _userData.studentBrithDay,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: bodyLarge,
                       textAlign: TextAlign.end,
                     ),
                   )
@@ -151,7 +157,7 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                   TableCell(
                     child: Text(
                       _userData.studentDocumentNomer,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: bodyLarge,
                       textAlign: TextAlign.end,
                     ),
                   )
@@ -164,7 +170,7 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                   TableCell(
                     child: Text(
                       _userData.studentAddres,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: bodyLarge,
                       textAlign: TextAlign.end,
                     ),
                   )
@@ -177,7 +183,7 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                   TableCell(
                     child: Text(
                       _userData.studentSchoolAndClassNumber,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: bodyLarge,
                       textAlign: TextAlign.end,
                     ),
                   )
@@ -190,7 +196,7 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                   TableCell(
                     child: Text(
                       _userData.studentPhone,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: bodyLarge,
                       textAlign: TextAlign.end,
                     ),
                   )
@@ -203,7 +209,7 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                   TableCell(
                     child: Text(
                       _userData.studentParentsFio,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: bodyLarge,
                       textAlign: TextAlign.end,
                     ),
                   )
@@ -216,7 +222,7 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                   TableCell(
                     child: Text(
                       _userData.studentParentsPhone,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: bodyLarge,
                       textAlign: TextAlign.end,
                     ),
                   )
@@ -229,7 +235,7 @@ class _OneStudentsViewState extends State<OneStudentsView> {
                   TableCell(
                     child: Text(
                       dataPayStatus(),
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: bodyLarge,
                       textAlign: TextAlign.end,
                     ),
                   )
@@ -237,6 +243,12 @@ class _OneStudentsViewState extends State<OneStudentsView> {
               ],
             ),
           ),
+          Gap(10.0),
+          Center(
+            child: Text("Все оплаты"),
+          ),
+          Gap(10.0),
+          // Expanded(child: OneStudentPaymentsData(studentId: _userData.id!))
         ],
       ),
     );

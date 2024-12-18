@@ -1,11 +1,11 @@
 import 'package:TeamLead/setting/setting_reposirory_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingRepository implements SettingReposiroryInterface {
+class SettingRepository implements SettingRepositoryInterface {
   SettingRepository({required this.preferences});
   final SharedPreferences preferences;
 
-  static const _isThemeSelectedKey = "dark_thrmr_select";
+  static const _isThemeSelectedKey = "dark_theme_select";
 
   @override
   bool isThemeSelect() {

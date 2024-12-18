@@ -6,15 +6,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'theme_state.dart';
 
 class ThemeCubit extends Cubit<ThemeState> {
-  ThemeCubit({required this.settingRepository})
-      : super(ThemeState(settingRepository.isThemeSelect()
-            ? Brightness.dark
-            : Brightness.light));
+  ThemeCubit({required SettingRepositoryInterface settingRepository})
+      : _settingRepository = settingRepository,
+        super(ThemeState(Brightness.light)) {
+    checkSelectedTheme();
+  }
 
-  final SettingReposiroryInterface settingRepository;
+  final SettingRepositoryInterface _settingRepository;
 
   Future<void> setThemeBrightness(Brightness brightness) async {
     emit(ThemeState(brightness));
-    await settingRepository.setThemeSelect(brightness == Brightness.dark);
+    await _settingRepository.setThemeSelect(brightness == Brightness.dark);
+  }
+
+  void checkSelectedTheme() {
+    final brightness =
+        _settingRepository.isThemeSelect() ? Brightness.dark : Brightness.light;
+    emit(ThemeState(brightness));
   }
 }

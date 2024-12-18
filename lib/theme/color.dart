@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const colorGreen = Color(0xFF0E6655);
 const colorRed = Color(0xFFFF0000);
-const colorBlue = Colors.blue;
+const colorBlue = Color(0xFF0080FF);
 const iconGreenColor = Color(0xDA76D7A9);
 const colorWhite = Color(0xFFFFFFFF);
 const formFildColor = Color(0xFFF2F3F4);

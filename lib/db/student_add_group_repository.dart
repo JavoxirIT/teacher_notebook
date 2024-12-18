@@ -135,7 +135,7 @@ class StudentAddGroupRepository extends InitDB {
       // log(' Future<List<StudentInAGroupModels>> queryOneGroup: ${element}');
       studentInAgroup.add(StudentInAGroupModels.fromMap(element));
     }
-    // log('${studentInAgroup.toString()}');
+    // log('studentInAgroup: ${studentInAgroup.toString()}');
     return studentInAgroup;
   }
 

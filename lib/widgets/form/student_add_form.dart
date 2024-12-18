@@ -10,12 +10,15 @@ import 'package:TeamLead/widgets/camera/camera_page.dart';
 import 'package:TeamLead/widgets/form/validate/validate_phone.dart';
 import 'package:TeamLead/widgets/form/validate/validete_form_fild.dart';
 import 'package:TeamLead/widgets/form/validate/validete_form_text.dart';
+import 'package:TeamLead/widgets/show_cupertino_modal_popup.dart';
 import 'package:TeamLead/widgets/show_snak_bar.dart';
 import 'package:TeamLead/widgets/table_row.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class StudentAddForm extends StatefulWidget {
   const StudentAddForm(this.group, {super.key});
@@ -27,17 +30,19 @@ class StudentAddForm extends StatefulWidget {
 }
 
 class _StudentAddFormState extends State<StudentAddForm> {
-  String base64String = '';
+  DateTime date = DateTime.now();
+  String? base64String;
   final noImage = "assets/images/no-image.png";
   final sDateFormate = "dd/MM/yyyy";
   final _formKey = GlobalKey<FormState>();
   DateTime? selectedDate;
   File? _studentImg;
   String? _pictureName;
+  String _studentBrithDay = "";
   final _studentName = TextEditingController();
   final _studentSurName = TextEditingController();
   final _studentSecondName = TextEditingController();
-  final _studentBrithDay = TextEditingController();
+
   final _studentAddres = TextEditingController();
   final _studentPhone = TextEditingController();
   final _studentSchoolAndClassNumber = TextEditingController();
@@ -51,7 +56,6 @@ class _StudentAddFormState extends State<StudentAddForm> {
     _studentName.dispose();
     _studentSurName.dispose();
     _studentSecondName.dispose();
-    _studentBrithDay.dispose();
     _studentAddres.dispose();
     _studentPhone.dispose();
     _studentSchoolAndClassNumber.dispose();
@@ -156,53 +160,37 @@ class _StudentAddFormState extends State<StudentAddForm> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: TextFormField(
-                controller: _studentBrithDay,
-                decoration: InputDecoration(
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        _studentBrithDay.clear();
-                      },
-                      child: const Icon(Icons.delete_outline),
-                    ),
-                    labelText: "Число, Месяц, Год рождения",
-                    helperText: "01.01.1999"),
-                // onTap: () async {
-                //   DateTime? date = DateTime(1900);
-                //   FocusScope.of(context).requestFocus(FocusNode());
-
-                //   date = await showDatePicker(
-                //     context: context,
-                //     initialDate: DateTime.now(),
-                //     firstDate: DateTime(1900),
-                //     lastDate: DateTime(2100),
-                //   );
-
-                //   dateCtl.text = date.toString();
-                // },
-                // onTap: () async {
-                //   await showDatePicker(
-                //     context: context,
-                //     // locale: const Locale('uz', 'UZ'),
-                //     initialDate: DateTime.now(), //get today's date
-                //     firstDate: DateTime(
-                //         1970), //DateTime.now() - not to allow to choose before today.
-                //     lastDate: DateTime(2101),
-                //     helpText: "Выберите дату",
-                //     cancelText: "Закрыть",
-                //     confirmText: "Принять",
-                //     fieldHintText: sDateFormate,
-                //   ).then(
-                //     (value) => {
-                //       setState(() {
-                //         _studentBrithDay.text = value.toString();
-                //       })
-                //     },
-                //   );
-                // },
-                validator: validate,
-                keyboardType: TextInputType.datetime,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+              ),
+              child: OutlinedButton(
+                onPressed: () {
+                  showCupModalPopup(
+                      CupertinoDatePicker(
+                        initialDateTime: date,
+                        mode: CupertinoDatePickerMode.date,
+                        onDateTimeChanged: (DateTime newDate) {
+                          setState(() {
+                            date = newDate;
+                            _studentBrithDay =
+                                DateFormat('dd.MM.yyyy').format(newDate);
+                          });
+                        },
+                      ),
+                      context,
+                      500);
+                },
+                style: const ButtonStyle(
+                  padding: WidgetStatePropertyAll(
+                      EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Дата рождения"),
+                    Text(DateFormat('dd.MM.yyyy').format(date)),
+                  ],
+                ),
               ),
             ),
             Padding(
@@ -351,25 +339,33 @@ class _StudentAddFormState extends State<StudentAddForm> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                 child: OutlinedButton(
                   onPressed: () => {
-                    if (_formKey.currentState!.validate())
+                    if (_studentBrithDay == "")
                       {
-                        _showDialog(
-                          context,
-                          _studentName.text,
-                          _studentSurName.text,
-                          _studentSecondName.text,
-                          _studentBrithDay.text,
-                          _studentAddres.text,
-                          _studentPhone.text,
-                          _studentSchoolAndClassNumber.text,
-                          _studentDocumentNomer.text,
-                          _studentParentsFio.text,
-                          _studentParentsPhone.text,
-                          _studentPayStatus,
-                        )
+                        showSnackInfoBar(
+                            context, 'Забыли выбрать день рождения'),
                       }
                     else
-                      {showSnackInfoBar(context, 'Сначала добавьте данные')}
+                      {
+                        if (_formKey.currentState!.validate())
+                          {
+                            _showDialog(
+                              context,
+                              _studentName.text,
+                              _studentSurName.text,
+                              _studentSecondName.text,
+                              _studentBrithDay,
+                              _studentAddres.text,
+                              _studentPhone.text,
+                              _studentSchoolAndClassNumber.text,
+                              _studentDocumentNomer.text,
+                              _studentParentsFio.text,
+                              _studentParentsPhone.text,
+                              _studentPayStatus,
+                            )
+                          }
+                        else
+                          {showSnackInfoBar(context, 'Сначала добавьте данные')}
+                      }
                   },
                   child: const Text(
                     "Добавить",
@@ -404,12 +400,12 @@ class _StudentAddFormState extends State<StudentAddForm> {
 
   imagetoBase64() async {
     // Read bytes from the file object
-    Uint8List _bytes = await _studentImg!.readAsBytes();
+    Uint8List bytes = await _studentImg!.readAsBytes();
 
     // base64 encode the bytes
-    String _base64String = base64.encode(_bytes);
+    String b64Str = base64.encode(bytes);
     setState(() {
-      base64String = _base64String;
+      base64String = b64Str;
       // print('base64String---->: ${base64String}');
     });
   }
@@ -479,16 +475,15 @@ class _StudentAddFormState extends State<StudentAddForm> {
     );
   }
 
-  void formSubmit() {
+  void formSubmit() async {
     _formKey.currentState?.save();
-    showSnackInfoBar(context, 'Данные сохранены');
-    StudentRepository.db.insertStudent(
+    var result = await StudentRepository.db.insertStudent(
       StudentDB(
           null,
           _studentName.text,
           _studentSecondName.text,
           _studentSurName.text,
-          _studentBrithDay.text,
+          _studentBrithDay,
           _studentAddres.text,
           _studentPhone.text,
           _studentSchoolAndClassNumber.text,
@@ -500,5 +495,8 @@ class _StudentAddFormState extends State<StudentAddForm> {
           0,
           0),
     );
+    if (result == "success") {
+      showSnackInfoBar(context, 'Студент добавлен');
+    }
   }
 }

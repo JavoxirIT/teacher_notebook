@@ -15,7 +15,7 @@ class PaymentsDB {
   late String year;
   late int payments;
   late int studentId;
-  late String studentSurName;
+  late String studentSurName = "Unknown";
   late String studentName;
   late int? timestampSeconds;
   late int? forWhichGroupId;
@@ -49,7 +49,6 @@ class PaymentsDB {
   @override
   toString() {
     return 'PaymentsDB(paysId: $paysId, payments: $payments, day: $day, month: $month, '
-        'year: $year, studentId: $studentId, studentSurName: $studentSurName, '
-        'studentName: $studentName, timestampSeconds: $timestampSeconds, forWhichGroupId: $forWhichGroupId)';
+        'year: $year, studentId: $studentId, timestampSeconds: $timestampSeconds, forWhichGroupId: $forWhichGroupId)';
   }
 }
