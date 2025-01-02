@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:TeamLead/db/constants/student_create_group_constant.dart';
 import 'package:TeamLead/db/constants/student_data_constants.dart';
 import 'package:TeamLead/db/constants/student_insert_group.dart';
@@ -83,8 +81,17 @@ class StudentAddGroupRepository extends InitDB {
   Future<List<StudentAndGroupModels>> queryALL(int id) async {
     groupAndStudentList.clear();
     Database? db = await database;
-    final List<Map<String, dynamic>> groupAndStudent = await db!.rawQuery(
-        'SELECT * FROM  $studentTable, $groupTable where  $groupTable.group_id = $id');
+    final List<Map<String, dynamic>> groupAndStudent = await db!.rawQuery('''
+      SELECT 
+        s.$studentId as id,
+        g.$groupId as group_id,
+        s.$studentName,
+        s.$studentSurName,
+        s.$studentImg,
+        s.$studentGroupStatus
+      FROM $studentTable s, $groupTable g 
+      WHERE g.$groupId = ?
+    ''', [id]);
 
     for (var element in groupAndStudent) {
       groupAndStudentList.add(StudentAndGroupModels.fromMap(element));
@@ -98,61 +105,53 @@ class StudentAddGroupRepository extends InitDB {
     Database? db = await database;
     final List<Map<String, dynamic>> data = await db!.rawQuery('''
         SELECT 
-          $studentTable.studentName, 
-          $studentTable.studentSurName, 
-          $studentTable.studentSecondName,
-          $studentTable.studentPhone,
-          $studentTable.studentImg, 
-          $studentTable.studentPayStatus, 
-          $studentsInAGroupTable.student_id, 
-          $studentsInAGroupTable.id, 
-          $studentsInAGroupTable.group_id, 
-          $studentsInAGroupTable.starting_date, 
-          $paysTable.timestamp_seconds,
-          $paysTable.forWhichGroupId 
-        FROM $studentsInAGroupTable 
-        INNER JOIN $studentTable 
-          ON $studentTable.id = $studentsInAGroupTable.student_id 
+          sig.$studentsInAGroupId as id,
+          sig.$studentsInAGroupStudentId as studentId,
+          sig.$studentsInAGroupGroupId as groupId,
+          s.$studentName as studentName,
+          s.$studentSurName as studentSurName,
+          s.$studentPhone as studentPhone,
+          s.$studentParentsFio as studentParentsFio,
+          s.$studentParentsPhone as studentParentsPhone,
+          s.$studentPayStatus as studentPayStatus,
+          s.$studentImg as studentImg,
+          sig.$studentsInAGroupStartingDate as startingDate,
+          p.forWhichGroupId as lastPaymentInGroup,
+          p.$timestampSeconds as lastPaymentDateTimeStamp
+        FROM $studentsInAGroupTable sig
+        JOIN $studentTable s ON sig.$studentsInAGroupStudentId = s.$studentId
         LEFT JOIN (
-          SELECT forWhichGroupId, student_id, MAX(timestamp_seconds) AS timestamp_seconds
+          SELECT 
+            $forWhichGroupId,
+            $paysStudentID,
+            MAX($timestampSeconds) as $timestampSeconds
           FROM $paysTable
-          WHERE forWhichGroupId = $id
-          GROUP BY forWhichGroupId, student_id
-        ) AS $paysTable
-          ON $paysTable.forWhichGroupId = $studentsInAGroupTable.group_id 
-          AND $paysTable.student_id = $studentsInAGroupTable.student_id
-        WHERE $studentsInAGroupTable.group_id = $id
-      ''');
-    // debugPrint("data: $data");
-    //
-    // final List<Map<String, dynamic>> pay = await db!.rawQuery('''
-    //   SELECT *
-    //   FROM $paysTable
-    //   WHERE forWhichGroupId = $id
-    // ''');
-    // debugPrint('Simple Query pays: $pay');
-    for (var element in data) {
-      // log(' Future<List<StudentInAGroupModels>> queryOneGroup: ${element}');
-      studentInAgroup.add(StudentInAGroupModels.fromMap(element));
-    }
-    // log('studentInAgroup: ${studentInAgroup.toString()}');
-    return studentInAgroup;
+          WHERE $forWhichGroupId = ?
+          GROUP BY $forWhichGroupId, $paysStudentID
+        ) p ON p.$forWhichGroupId = sig.$studentsInAGroupGroupId 
+          AND p.$paysStudentID = sig.$studentsInAGroupStudentId
+        WHERE sig.$studentsInAGroupGroupId = ?
+    ''', [id, id]);
+
+    return data.map((map) => StudentInAGroupModels.fromMap(map)).toList();
   }
 
-  Future<int> deleteStudentFromGroup(int id, int studentId) async {
+  Future<int> deleteStudentFromGroup(int groupId, int studentId) async {
     Database? db = await database;
-    final updateUserTable = await db!.update(
+
+    // Обновляем статус студента
+    await db!.update(
       studentTable,
       {"studentGroupId": 0, "studentGroupStatus": 0},
       where: '$studentId = ?',
       whereArgs: [studentId],
     );
 
-    log('updateUserTable: $updateUserTable');
+    // Удаляем запись из таблицы связей
     return await db.delete(
       studentsInAGroupTable,
-      where: '$studentsInAGroupId = ?',
-      whereArgs: [id],
+      where: '$studentsInAGroupGroupId = ? AND $studentsInAGroupStudentId = ?',
+      whereArgs: [groupId, studentId],
     );
   }
 

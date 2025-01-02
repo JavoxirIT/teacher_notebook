@@ -29,3 +29,5 @@ final class StudentAndGroupErrorState extends StudentAndGroupListState {
   List<Object> get props => super.props..add(exception);
 }
 
+final class StudentAndGroupNoDataState extends StudentAndGroupListState {} 
+

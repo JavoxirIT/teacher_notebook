@@ -1,38 +1,39 @@
 class StudentDB {
-  StudentDB(
+  StudentDB( {
     this.id,
-    this.studentName,
-    this.studentSecondName,
-    this.studentSurName,
-    this.studentBrithDay,
-    this.studentAddres,
-    this.studentPhone,
-    this.studentSchoolAndClassNumber,
-    this.studentDocumentNomer,
+    required this.studentName,
+    required this.studentSecondName,
+    required this.studentSurName,
+    required this.studentBrithDay,
+    this.studentAddres  = "Не указано",
+    required this.studentPhone,
+    this.studentSchoolAndClassNumber = "Не указано",
+    this.studentDocumentNomer = "Не указано",
     this.studentImg,
-    this.studentPayStatus,
-    this.studentParentsFio,
-    this.studentParentsPhone,
-    this.studentGroupId,
-    this.studentGroupStatus,
-  );
+    required this.studentPayStatus,
+    this.studentParentsFio = "Не указано",
+    this.studentParentsPhone = "Не указано",
+    this.studentGroupId = 0,
+    this.studentGroupStatus = 0,
+    this.studentGroupName = "Не указано",
+  });
 
-  late int? id;
-  late String studentName;
-  late String studentSecondName;
-  late String studentSurName;
-  late String studentBrithDay;
-  late String studentAddres;
-  late String studentPhone;
-  late String studentSchoolAndClassNumber;
-  late String studentDocumentNomer;
-  late String? studentImg;
-  late int studentPayStatus;
-  late String studentParentsFio;
-  late String studentParentsPhone;
-  late int? studentGroupId = 0;
-  late String studentGroupName;
-  late int? studentGroupStatus = 0;
+  final int? id;
+  final String studentName;
+  final String studentSecondName;
+  final String studentSurName;
+  final String? studentBrithDay;
+  final String? studentAddres;
+  final String studentPhone;
+  final String? studentSchoolAndClassNumber;
+  final String? studentDocumentNomer;
+  final String? studentImg;
+  final int studentPayStatus;
+  final String? studentParentsFio;
+  final String? studentParentsPhone;
+  final int? studentGroupId;
+  final String? studentGroupName;
+  final int? studentGroupStatus;
 
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};
@@ -54,25 +55,27 @@ class StudentDB {
     return map;
   }
 
-  StudentDB.fromMap(Map<String, dynamic> map) {
-    id = map["id"];
-    studentName = map["studentName"];
-    studentSecondName = map["studentSecondName"];
-    studentSurName = map["studentSurName"];
-    studentBrithDay = map["studentBrithDay"];
-    studentAddres = map["studentAddres"];
-    studentPhone = map["studentPhone"];
-    studentPayStatus = map["studentPayStatus"];
-    studentSchoolAndClassNumber = map["schoolAndClassNumber"];
-    studentDocumentNomer = map["studentDocumentNomer"];
-    studentParentsFio = map["studentParentsFio"];
-    studentParentsPhone = map["studentParentsPhone"];
-    studentImg = map["studentImg"];
+ factory StudentDB.fromMap(Map<String, dynamic> map) {
+    return StudentDB(
+    id: map["id"],
+    studentName: map["studentName"],
+    studentSecondName: map["studentSecondName"],
+    studentSurName: map["studentSurName"],
+    studentBrithDay: map["studentBrithDay"],
+    studentAddres: map["studentAddres"],
+    studentPhone: map["studentPhone"],
+    studentPayStatus: map["studentPayStatus"],
+    studentSchoolAndClassNumber: map["schoolAndClassNumber"],
+    studentDocumentNomer: map["studentDocumentNomer"],
+    studentParentsFio: map["studentParentsFio"],
+    studentParentsPhone: map["studentParentsPhone"],
+    studentImg: map["studentImg"],
     // studentGroupId =
     //     map["studentGroupId"] != null ? map["studentGroupId"] : 0;
-    studentGroupId = map["studentGroupId"];
-    studentGroupStatus = map["studentGroupStatus"];
+    studentGroupId: map["studentGroupId"],
+    studentGroupStatus: map["studentGroupStatus"],
     // studentGroupName = map["name"];
+    );
   }
   @override
   String toString() {

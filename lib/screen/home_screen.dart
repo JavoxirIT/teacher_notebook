@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:TeamLead/db/payments_repository.dart';
 import 'package:TeamLead/db/student_repository.dart';
 import 'package:TeamLead/navigation/drawer_menu.dart';
 import 'package:TeamLead/widgets/group/group_list.dart';
@@ -15,6 +18,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int studentCount = 0;
   int numberOfPaid = 0;
   int numberNotOfPaid = 0;
+  Map<String, dynamic> currentMonthTotalPayments = {
+    'total': 0,
+    'month': 0,
+    'year': 0
+  };
 
   @override
   void initState() {
@@ -43,7 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
             HomeGrid(
                 stCount: studentCount,
                 numberOfPaid: numberOfPaid,
-                numberNotOfPaid: numberNotOfPaid),
+                numberNotOfPaid: numberNotOfPaid,
+                currentMonthTotalPayments: currentMonthTotalPayments),
             SizedBox(
               width: MediaQuery.of(context).size.width,
               child: const Padding(
@@ -66,9 +75,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> getStudentCount() async {
-    studentCount = await StudentRepository.db.getStudentCount();
-    numberOfPaid = await StudentRepository.db.getStudentCountPay();
-    numberNotOfPaid = await StudentRepository.db.getStudentCountNotPay();
-    setState(() {});
+    // Анализируем платежи за декабрь 2024
+    final now = DateTime.now();
+    try {
+      final results = await Future.wait([
+        StudentRepository.db.getStudentCount(),
+        StudentRepository.db.getStudentCountPay(),
+        StudentRepository.db.getStudentCountNotPay(),
+        PaysRepository.db.getCurrentMonthPaymentsSum(
+          now.month.toString(),
+          now.year.toString(),
+        ),
+      ]);
+
+      studentCount = results[0] as int;
+      numberOfPaid = results[1] as int;
+      numberNotOfPaid = results[2] as int;
+      currentMonthTotalPayments = results[3] as Map<String, dynamic>;
+
+      setState(() {});
+    } catch (e) {
+      debugPrint('Error getting student counts: $e');
+    }
   }
 }

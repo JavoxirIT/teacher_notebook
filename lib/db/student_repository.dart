@@ -3,7 +3,20 @@ import 'dart:developer';
 import 'package:TeamLead/db/constants/student_data_constants.dart';
 import 'package:TeamLead/db/init_db.dart';
 import 'package:TeamLead/db/models/student_bd_models.dart';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+
+enum DatabaseResult { success, error, databaseNotFound, duplicateEntry }
+
+class DatabaseException implements Exception {
+  final String message;
+  final DatabaseResult result;
+
+  DatabaseException(this.message, this.result);
+
+  @override
+  String toString() => message;
+}
 
 class StudentRepository extends InitDB {
   static final StudentRepository db = StudentRepository();
@@ -15,43 +28,72 @@ class StudentRepository extends InitDB {
   Future<List<StudentDB>> getStudents() async {
     studentsList.clear();
     Database? db = await database;
-    // final List<Map<String, dynamic>> studentMapList =
-    //     await db!.query(studentTable);
-    // final List<Map<String, dynamic>> studentMapList = await db!.rawQuery(
-    //     'SELECT  $studentTable.id, $studentTable.studentName, $studentTable.studentSecondName, $studentTable.studentSurName, $studentTable.studentBrithDay, $studentTable.studentAddres, $studentTable.studentPhone, $studentTable.schoolAndClassNumber, $studentTable.studentDocumentNomer, $studentTable.studentParentsFio, $studentTable.studentParentsPhone, $studentTable.studentPayStatus, $studentTable.studentImg, $studentTable.studentGroupId, $groupTable.name   FROM $groupTable inner join $studentTable on  $studentTable.studentGroupId = $groupTable.id');
     final List<Map<String, dynamic>> studentMapList =
         await db!.query(studentTable);
 
     for (var element in studentMapList) {
       studentsList.add(StudentDB.fromMap(element));
     }
-    log(studentsList.toString());
-    // if (studentsLists.isEmpty) return  studentsList;
     return studentsList;
   }
 
   // 'SELECT  $studentTable.studentName, $studentTable.studentSurName, $paysTable.student_id, $paysTable.summa, $paysTable.date, $paysTable.id  FROM $paysTable inner join $studentTable  on  $studentTable.id = $paysTable.student_id'
 
 // INSERT
-  Future<String> insertStudent(StudentDB student) async {
-    Database? db = await database;
-    student.id = await db!.insert(studentTable, student.toMap());
-    log("$student");
-    if (student.id != null) {
-      return "success";
+  Future<DatabaseResult> insertStudent(StudentDB student) async {
+    try {
+      final db = await database;
+      if (db == null) {
+        throw DatabaseException(
+            'Database not initialized', DatabaseResult.databaseNotFound);
+      }
+
+      final id = await db.insert(studentTable, student.toMap());
+
+      if (id > 0) {
+        debugPrint('Student inserted successfully with id: $id');
+        return DatabaseResult.success;
+      } else {
+        throw DatabaseException(
+            'Failed to insert student', DatabaseResult.error);
+      }
+    } catch (e) {
+      debugPrint('Error inserting student: $e');
+      if (e is DatabaseException) {
+        rethrow;
+      }
+      throw DatabaseException('Database error: $e', DatabaseResult.error);
     }
-    return 'error';
   }
 
 // UPDATE
-  Future<int> updateStudent(StudentDB student) async {
-    Database? db = await database;
-    return await db!.update(
-      studentTable,
-      student.toMap(),
-      where: '$studentId = ?',
-      whereArgs: [student.id],
-    );
+  Future<DatabaseResult> updateStudent(StudentDB student) async {
+    try {
+      Database? db = await database;
+      if (db == null) {
+        throw DatabaseException(
+            'Database not initialized', DatabaseResult.databaseNotFound);
+      }
+      final id = await db.update(
+        studentTable,
+        student.toMap(),
+        where: '$studentId = ?',
+        whereArgs: [student.id],
+      );
+      if (id > 0) {
+        debugPrint('Student updated successfully with id: $id');
+        return DatabaseResult.success;
+      } else {
+        throw DatabaseException(
+            'Failed to update student', DatabaseResult.error);
+      }
+    } catch (e) {
+      debugPrint('Error update student: $e');
+      if (e is DatabaseException) {
+        rethrow;
+      }
+      throw DatabaseException('Database error: $e', DatabaseResult.error);
+    }
   }
 
 // DELETE
@@ -66,29 +108,31 @@ class StudentRepository extends InitDB {
 
   // SEARCH
   Future<List<StudentDB>> searchStudent(String input) async {
-    studentsList.clear();
-    Database? db = await database;
-    // Подготавливаем строку поиска с подстановочными символами
-    final searchQuery = '%$input%';
+    List<StudentDB> searchResults = [];
+    try {
+      Database? db = await database;
+      final searchQuery = '%$input%';
 
-    // SQL-запрос для поиска студентов
-    final sql = '''
+      final sql = '''
     SELECT * 
     FROM $studentTable
     WHERE $studentSecondName LIKE ? 
        OR $studentName LIKE ? 
        OR $studentSurName LIKE ?
-  ''';
+    ''';
 
-    // Выполнение запроса с передачей параметров
-    final result =
-        await db!.rawQuery(sql, [searchQuery, searchQuery, searchQuery]);
-    if (result.isNotEmpty) {
-      for (var element in result) {
-        studentsList.add(StudentDB.fromMap(element));
+      final result =
+          await db!.rawQuery(sql, [searchQuery, searchQuery, searchQuery]);
+      if (result.isNotEmpty) {
+        for (var element in result) {
+          searchResults.add(StudentDB.fromMap(element));
+        }
       }
+    } catch (e) {
+      // Логирование ошибки
+      debugPrint('Error during search: $e');
     }
-    return studentsList;
+    return searchResults;
   }
 
   // Метод для получения количества записей (пользователей)

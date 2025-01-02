@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:TeamLead/bloc/student_bloc/student_bloc.dart';
+import 'package:TeamLead/bloc/student_in_a_group_bloc/student_in_a_group_bloc.dart';
 import 'package:TeamLead/db/models/one_student_in_groups.dart';
 // import 'package:TeamLead/db/models/student_bd_models.dart';
 import 'package:TeamLead/db/models/payments_db_models.dart';
@@ -46,6 +47,7 @@ class PaymentsFormState extends State<PaymentsForm> {
   int _selectedGroup = 0;
 
   List<OneStudentInGroups> oneStudentInGroup = [];
+  bool _isSaving = false;
 
   @override
   void dispose() {
@@ -205,7 +207,7 @@ class PaymentsFormState extends State<PaymentsForm> {
                   child: OutlinedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        _showModal(_payValue.text, _dateValue.text);
+                        _showModal(_payValue.text);
                       } else {
                         showSnackInfoBar(context, 'Сначала добавьте данные');
                       }
@@ -230,11 +232,51 @@ class PaymentsFormState extends State<PaymentsForm> {
     setState(() {});
   }
 
-  Future<void> _showModal(pay, date) async {
+  Future<bool> formSubmit() async {
+    var info = DateFormat('dd/MM/yyyy').format(date).split("/");
+    String days = info[0];
+    String months = info[1];
+    String years = info[2];
+    int timestampSecondsDefault = date.millisecondsSinceEpoch ~/ 1000;
+    _formKey.currentState?.save();
+    try {
+      String result = await PaysRepository().insertStudentPayments(
+        PaymentsDB(
+          payments: int.parse(_payValue.text),
+          day: day ?? days,
+          month: month ?? months,
+          year: year ?? years,
+          studentId: widget.studentId,
+          timestampSeconds: timestampSeconds ?? timestampSecondsDefault,
+          forWhichGroupId:
+              widget.groupId ?? oneStudentInGroup[_selectedGroup].groupId,
+        ),
+      );
+
+      if (result == "success") {
+        showSnackInfoBar(context, 'Данные сохранены');
+        BlocProvider.of<StudentBloc>(context).add(StudentEventLoad());
+        return true;
+      }
+      showSnackInfoBar(context, 'Ошибка при сохранении');
+      return false;
+    } catch (e) {
+      log("error: $e");
+      return false;
+    }
+  }
+
+  Future<void> _showModal(String pay) async {
     var info = DateFormat('dd/MM/yyyy').format(DateTime.now()).split("/");
     String days = info[0];
     String months = info[1];
     String years = info[2];
+
+    if (widget.groupId == null && oneStudentInGroup.isEmpty) {
+      showSnackInfoBar(context, 'Нет доступных групп');
+      return;
+    }
+
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -260,52 +302,45 @@ class PaymentsFormState extends State<PaymentsForm> {
               },
               child: const Text("Нет"),
             ),
-            ElevatedButton(
-              onPressed: () {
-                formSubmit();
-                Navigator.of(context).pop(true);
-                // Navigator.of(context).pushNamed(RouteName.localStudent);
+            StatefulBuilder(
+              builder: (context, setState) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    setState(() => _isSaving = true);
+                    try {
+                      final success = await formSubmit();
+                      if (success) {
+                        Navigator.of(context).pop(true);
+                        BlocProvider.of<StudentInAGroupBloc>(context)
+                            .add(LoadStudentsEvent(widget.groupId));
+                        await Future.delayed(const Duration(milliseconds: 300));
+                        if (mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      }
+                    } finally {
+                      if (mounted) {
+                        setState(() => _isSaving = false);
+                      }
+                    }
+                  },
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text("Сохранить"),
+                );
               },
-              child: const Text("Сохранить"),
             ),
           ],
         );
       },
     );
-  }
-
-  void formSubmit() async {
-    var info = DateFormat('dd/MM/yyyy').format(date).split("/");
-    String days = info[0];
-    String months = info[1];
-    String years = info[2];
-    int timestampSecondsDefault = date.millisecondsSinceEpoch ~/ 1000;
-    // log("payments: ${int.parse(_payValue.text)}");
-    // log("studentId: ${widget._userData.id!}");
-    _formKey.currentState?.save();
-    try {
-      String result = await PaysRepository().insertStudentPayments(
-        PaymentsDB(
-          payments: int.parse(_payValue.text),
-          day: day ?? days,
-          month: month ?? months,
-          year: year ?? years,
-          studentId: widget.studentId,
-          timestampSeconds: timestampSeconds ?? timestampSecondsDefault,
-          forWhichGroupId:
-              widget.groupId ?? oneStudentInGroup[_selectedGroup].groupId,
-        ),
-      );
-
-      if (result == "success") {
-        showSnackInfoBar(context, 'Данные сохранены');
-        BlocProvider.of<StudentBloc>(context).add(StudentEventLoad());
-      }
-      if (result == "error") {
-        showSnackInfoBar(context, 'Ошибка при сохранении');
-      }
-    } catch (e) {
-      log("error: $e");
-    }
   }
 }

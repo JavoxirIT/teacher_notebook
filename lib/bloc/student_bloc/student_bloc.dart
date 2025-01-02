@@ -12,6 +12,13 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
     on<StudentEventSearch>(_searchStudenet);
   }
   final StudentRepository _dbProvider;
+
+  @override
+  Future<void> close() {
+    // Закрыть все стримы и освободить ресурсы
+    return super.close();
+  }
+
   Future<void> _loadStudet(
       StudentEventLoad event, Emitter<StudentState> emit) async {
     try {
@@ -31,14 +38,14 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
 
   Future<void> _searchStudenet(
       StudentEventSearch event, Emitter<StudentState> emit) async {
-    final search = await _dbProvider.searchStudent(event.searchText);
+      final search = await _dbProvider.searchStudent(event.searchText);
     // if (search.isEmpty) {
     //   emit(StudentSearchNoDataState());
     // }
-    if (search.isNotEmpty) {
-      emit(StudentLoadedState(
-        loadedStudent: search,
-      ));
+      if (search.isNotEmpty) {
+        emit(StudentLoadedState(
+          loadedStudent: search,
+        ));
     }
   }
 }

@@ -3,38 +3,48 @@ class StudentInAGroupModels {
   late int studentId;
   late int groupId;
   late String studentName;
-  late String studentSecondName;
   late String studentSurName;
-  late String studentPhone;
-  late String? studentImg;
+  String? studentPhone;
+  String? studentParentsFio;
+  String? studentParentsPhone;
+  String? studentImg;  
   late int studentPayStatus;
-  late int? studentGroupId;
-  late String studentGroupName;
   late int startingDate;
   late int? lastPaymentInGroup;
   late int lastPaymentDateTimeStamp;
 
   StudentInAGroupModels.fromMap(Map<String, dynamic> map) {
     id = map["id"];
-    studentId = map["student_id"];
+    studentId = map["studentId"];
+    groupId = map["groupId"];
     studentName = map["studentName"];
-    studentSecondName = map["studentSecondName"];
     studentSurName = map["studentSurName"];
     studentPhone = map["studentPhone"];
+    studentParentsFio = map["studentParentsFio"];
+    studentParentsPhone = map["studentParentsPhone"];
+    studentImg = map["studentImg"];  
     studentPayStatus = map["studentPayStatus"];
-    studentImg = map["studentImg"];
-    groupId = map["group_id"];
-    lastPaymentInGroup = map['forWhichGroupId'];
-    startingDate = map['starting_date'];
-    lastPaymentDateTimeStamp = map['timestamp_seconds'] ?? 00;
+    startingDate = map["startingDate"];
+    lastPaymentInGroup = map["lastPaymentInGroup"];
+    lastPaymentDateTimeStamp = map["lastPaymentDateTimeStamp"] ?? 0;
   }
 
   @override
   String toString() {
-    return 'StudentInAGroupModels(id: $id, studentId: $studentId, '
-        'studentName: $studentName, studentSecondName: $studentSecondName,'
-        ' studentSurName: $studentSurName,  studentPhone: $studentPhone, '
-        'studentPayStatus: $studentPayStatus,groupId: $groupId, startingDate: $startingDate, '
-        'lastPaymentInGroup: $lastPaymentInGroup, lastPaymentDateTimeStamp: $lastPaymentDateTimeStamp)';
+    return 'StudentInAGroupModels('
+        'id: $id, '
+        'studentId: $studentId, '
+        'groupId: $groupId, '
+        'studentName: $studentName, '
+        'studentSurName: $studentSurName, '
+        'studentPhone: $studentPhone, '
+        'studentParentsFio: $studentParentsFio, '
+        'studentParentsPhone: $studentParentsPhone, '
+        'studentImg: $studentImg, '  
+        'studentPayStatus: $studentPayStatus, '
+        'startingDate: $startingDate, '
+        'lastPaymentInGroup: $lastPaymentInGroup, '
+        'lastPaymentDateTimeStamp: $lastPaymentDateTimeStamp'
+        ')';
   }
 }

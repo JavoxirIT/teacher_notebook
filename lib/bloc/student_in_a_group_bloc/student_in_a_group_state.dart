@@ -1,35 +1,44 @@
 part of 'student_in_a_group_bloc.dart';
 
-sealed class StudentInAGroupBlockState extends Equatable {
-  const StudentInAGroupBlockState();
+abstract class StudentInAGroupState extends Equatable {
+  const StudentInAGroupState();
 
   @override
   List<Object> get props => [];
 }
 
-final class StudentInAGroupBlockInitial extends StudentInAGroupBlockState {}
+class StudentInAGroupInitialState extends StudentInAGroupState {}
 
-// КОГДА НЕТ ДАННЫХ О ГРУППЕ
-final class StudentInAGroupNotDataState extends StudentInAGroupBlockState {}
+class StudentInAGroupLoadingState extends StudentInAGroupState {}
 
-// ПРИ УСПЕШНОМ ПОЛУЧЕНИЕ ДАННЫХ
-final class StudentInAGroupLoadState extends StudentInAGroupBlockState {
-  const StudentInAGroupLoadState(this.data);
+class StudentInAGroupLoadState extends StudentInAGroupState {
   final List<StudentInAGroupModels> data;
+  final Map<String, Map<int, bool>> paymentStatusCache;
+
+  const StudentInAGroupLoadState(this.data, {this.paymentStatusCache = const {}});
+
+  StudentInAGroupLoadState copyWith({
+    List<StudentInAGroupModels>? data,
+    Map<String, Map<int, bool>>? paymentStatusCache,
+  }) {
+    return StudentInAGroupLoadState(
+      data ?? this.data,
+      paymentStatusCache: paymentStatusCache ?? this.paymentStatusCache,
+    );
+  }
 
   @override
-  List<Object> get props => super.props..addAll([data]);
+  List<Object> get props => [data, paymentStatusCache];
 }
 
-// ОШИБКА ПРИ ПОЛУЧЕНИЕ ДАННЫХ
-final class StudentInAGroupErrorState extends StudentInAGroupBlockInitial {
-  StudentInAGroupErrorState({
-    required this.exception,
-  });
+class StudentInAGroupNotDataState extends StudentInAGroupState {}
+
+class StudentInAGroupErrorState extends StudentInAGroupState {
   final Exception exception;
+  const StudentInAGroupErrorState({required this.exception});
 
   @override
-  List<Object> get props => super.props..add(exception);
+  List<Object> get props => [exception];
 }
 
-final class StudentInaGroupDeleteState extends StudentInAGroupBlockState {}
+class StudentInAGroupDeleteState extends StudentInAGroupState {}

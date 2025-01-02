@@ -20,10 +20,12 @@ class StudentAndGroupListBloc
       Emitter<StudentAndGroupListState> emit) async {
     try {
       final result = await _groupRepository.queryALL(event.id!);
+       final sortedData = List<StudentAndGroupModels>.from(result)
+        ..sort((a, b) => a.studentName.compareTo(b.studentName));
       if (result.isEmpty) {
-        emit(StudentAndGroupListInitial());
+        emit(StudentAndGroupNoDataState());
       } else {
-        emit(StudentAndGroupLoadState(result));
+        emit(StudentAndGroupLoadState(sortedData));
       }
     } on Exception catch (e) {
       emit(StudentAndGroupErrorState(exception: e));

@@ -1,6 +1,6 @@
 import 'package:TeamLead/navigation/drawer_menu.dart';
 import 'package:TeamLead/widgets/search.dart';
-import 'package:TeamLead/widgets/student_list/general_list_of_students.dart';
+import 'package:TeamLead/widgets/student_list/local_data_student_list.dart';
 import 'package:flutter/material.dart';
 
 class StudentsScreen extends StatelessWidget {
@@ -10,20 +10,23 @@ class StudentsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "ВСЕ УЧЕНИКИ",
+          "Список всех учеников",
         ),
       ),
       drawer: const DrawerMenu(),
-      body: const Column(
-        children: [
-          SearchBarComponents(),
-          Expanded(
-            child: SizedBox(
-              // height: 200.0,
-              child: GeneralListOfStudents(),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        child: const Column(
+          children: [
+            SearchBarComponents(),
+            Expanded(
+              child: SizedBox(
+                // height: 200.0,
+                child: LocalDataStudentList(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

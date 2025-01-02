@@ -6,6 +6,13 @@ import 'package:TeamLead/db/init_db.dart';
 import 'package:TeamLead/db/models/payments_db_models.dart';
 import 'package:sqflite/sqflite.dart';
 
+enum PaysRepositoryStatus {
+  success,
+  error,
+  databaseException,
+  duplicateEntry,
+}
+
 class PaysRepository extends InitDB {
   static final PaysRepository db = PaysRepository();
 
@@ -23,7 +30,7 @@ class PaysRepository extends InitDB {
       }
       return "error";
     } catch (e) {
-      log("Ошибка в INSERT PAYMENTS: $e");
+      // log("Ошибка в INSERT PAYMENTS: $e");
       throw Exception("Ошибка в INSERT PAYMENTS: $e");
     }
   }
@@ -92,7 +99,6 @@ class PaysRepository extends InitDB {
     // Выполняем запрос
     final List<Map<String, dynamic>> filteredData =
         await db!.rawQuery(sql, parameters);
-
     // Группируем данные
     Map<String, List<PaymentsDB>> groupedData = {};
 
@@ -127,7 +133,143 @@ class PaysRepository extends InitDB {
     for (var element in studentPaymentData) {
       paymentsOne.add(PaymentsDB.fromMap(element));
     }
-    log(paymentsOne.toString());
+    // log(paymentsOne.toString());
     return paymentsOne;
   }
+
+  // READ ALL GROUP PAYMENTS
+  Future<List<PaymentsDB>> getAllGroupPayments(int groupId) async {
+    paymentsList.clear();
+    Database? db = await database;
+    final List<Map<String, dynamic>> studentPaymentData = await db!.rawQuery(
+      '''
+      SELECT $paysTable.*, $studentTable.studentName, $studentTable.studentSurName 
+      FROM $paysTable 
+      INNER JOIN $studentTable ON $studentTable.id = $paysTable.student_id 
+      WHERE $paysTable.forWhichGroupId = ?
+      ORDER BY $paysTable.timestamp_seconds DESC
+      ''',
+      [groupId],
+    );
+
+    for (var element in studentPaymentData) {
+      paymentsList.add(PaymentsDB.fromMap(element));
+    }
+    return paymentsList;
+  }
+
+  // Проверка оплаты студента за текущий месяц
+  Future<Object> hasPaymentForCurrentMonth(
+      int studentId, int? month, int? year) async {
+    try {
+      Database? db = await database;
+      final now = DateTime.now();
+      final currentMonth = now.month.toString();
+      final currentYear = now.year.toString();
+
+      final List<Map<String, dynamic>> result = await db!.query(
+        paysTable,
+        where: 'student_id = ? AND month = ? AND year = ?',
+        whereArgs: [studentId, month ?? currentMonth, year ?? currentYear],
+      );
+      return result.isNotEmpty ? PaysRepositoryStatus.success : PaysRepositoryStatus.duplicateEntry;
+    } on DatabaseException {
+      return PaysRepositoryStatus.databaseException;
+    } catch (e) {
+      return PaysRepositoryStatus.error;
+    }
+  }
+
+  Future<Map<String, dynamic>> getCurrentMonthPaymentsSum(
+      String? months, String? years) async {
+    Database? db = await database;
+    final date = DateTime.now();
+    if (db == null) {
+      return {
+        'total': 0,
+        'month': int.parse(months ?? date.month.toString()),
+        'year': int.parse(years ?? date.year.toString())
+      };
+    }
+
+    final result = await db.rawQuery('''
+      SELECT SUM($paysSumma) as total
+      FROM $paysTable
+      WHERE $month = ? AND $year = ?
+    ''', [months ?? date.month, years ?? date.year]);
+    final total = result.first['total'];
+
+    return {
+      'total': total == null ? 0 : total as int,
+      'month': int.parse(months ?? date.month.toString()),
+      'year': int.parse(years ?? date.year.toString())
+    };
+  }
+
+//   Future<void> removeDuplicatePayments() async {
+//     Database? db = await database;
+//     if (db == null) return;
+
+//     // Начинаем транзакцию
+//     await db.transaction((txn) async {
+//       // Находим дубликаты для student_id: 7 и 10 за декабрь 2024
+//       final duplicates = await txn.rawQuery('''
+//         WITH numbered AS (
+//           SELECT id,
+//                  ROW_NUMBER() OVER (
+//                    PARTITION BY student_id, month, year
+//                    ORDER BY timestamp_seconds DESC
+//                  ) as rn
+//           FROM $paysTable
+//           WHERE student_id IN (7, 10)
+//           AND month = 12
+//           AND year = 2024
+//         )
+//         SELECT id FROM numbered WHERE rn > 1
+//       ''');
+
+//       if (duplicates.isNotEmpty) {
+//         // Получаем список ID для удаления
+//         final idsToDelete = duplicates.map((row) => row['id'] as int).toList();
+
+//         // Логируем количество записей для удаления
+//         log('Found ${idsToDelete.length} duplicate payments to delete');
+
+//         // Удаляем дубликаты
+//         final deletedCount = await txn.delete(
+//           paysTable,
+//           where: 'id IN (${idsToDelete.join(',')})',
+//         );
+
+//         log('Deleted $deletedCount duplicate payments');
+//       } else {
+//         log('No duplicates found');
+//       }
+//     });
+//   }
+
+//   Future<int> deletePaymentsByStudentIds(List<int> studentIds) async {
+//     Database? db = await database;
+//     if (db == null) return 0;
+
+//     // Сначала выведем, какие записи будут удалены
+//     final recordsToDelete = await db.query(
+//       paysTable,
+//       where: 'student_id IN (${studentIds.join(",")})',
+//     );
+
+//     log('Will delete ${recordsToDelete.length} payments:');
+//     for (var record in recordsToDelete) {
+//       log('Payment ID: ${record['id']}, Student ID: ${record['student_id']}, Amount: ${record['summa']}');
+//     }
+
+//     // Удаляем записи
+//     final deletedCount = await db.delete(
+//       paysTable,
+//       where: 'student_id IN (${studentIds.join(",")})',
+//     );
+
+//     log('Deleted $deletedCount payments');
+//     return deletedCount;
+//   }
 }

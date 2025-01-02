@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:TeamLead/bloc/student_bloc/student_bloc.dart';
 import 'package:TeamLead/theme/color.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +14,21 @@ class SearchBarComponents extends StatefulWidget {
 
 class _SearchBarComponentsState extends State<SearchBarComponents> {
   final _searchText = TextEditingController();
-  // final _studentDataBloc = StudentBloc(DBProvider.db);
+  Timer? _debounce;
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (_searchText.text.isNotEmpty) {
+        BlocProvider.of<StudentBloc>(context)
+            .add(StudentEventSearch(searchText: _searchText.text));
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchText.dispose();
     super.dispose();
   }
@@ -23,19 +36,12 @@ class _SearchBarComponentsState extends State<SearchBarComponents> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StudentBloc, StudentState>(
-      // bloc: _studentDataBloc,
       builder: (context, state) {
         return Container(
           color: colorWhite,
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
           child: TextFormField(
-            onChanged: (value) {
-              if (_searchText.text != "") {
-                // BlocProvider.of<StudentBloc>(context).add(StudentEventLoad());
-                BlocProvider.of<StudentBloc>(context)
-                    .add(StudentEventSearch(searchText: _searchText.text));
-              }
-            },
+            onChanged: _onSearchChanged,
             controller: _searchText,
             decoration: InputDecoration(
               suffixIcon: GestureDetector(

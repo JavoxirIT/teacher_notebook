@@ -1,4 +1,4 @@
-String? valideteText(String input) {
+String? validateText(String input) {
   final textExp = RegExp(r'^[a-zA-Z-А-Яа-я\s]+$');
   if (input.isEmpty) {
     return "Заполните поле";
